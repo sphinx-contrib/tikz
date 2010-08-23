@@ -39,7 +39,7 @@ class TikzDirective(Directive):
     def run(self):
         node = tikz()
         node['tikz'] = '\n'.join(self.content)
-        node['arguments'] = self.arguments
+        node['caption'] = '\n'.join(self.arguments)
         node['libs'] = self.options.get('libs', None)
         return [node]
 
@@ -64,8 +64,8 @@ DOC_BODY = r'''
 \end{document}
 '''
 
-def render_tikz(self,node):
-    hashkey = node['tikz'].encode('utf-8')
+def render_tikz(self,tikz,libs):
+    hashkey = tikz.encode('utf-8')
     fname = 'tikz-%s.png' % (sha(hashkey).hexdigest())
     if hasattr(self.builder, 'imgpath'):
         # 'HTML'
@@ -86,11 +86,11 @@ def render_tikz(self,node):
     
     ensuredir(path.dirname(outfn))
 
-    libs = ''
-    if node['libs']:
-        libs = '\usetikzlibrary{' + node['libs'] + '}'
+    libraries = ''
+    if libs:
+        libraries = '\usetikzlibrary{' + libs + '}'
 
-    latex = DOC_HEAD % libs + DOC_BODY % node['tikz']
+    latex = DOC_HEAD % libraries + DOC_BODY % tikz
     if isinstance(latex, unicode):
         latex = latex.encode('utf-8')
 
@@ -167,22 +167,22 @@ def render_tikz(self,node):
     return relfn
 
 def html_visit_tikz(self,node):
-    print "\n***********************************"
-    print "You have entered the following argument"
-    print "***********************************"
-    for line in node['arguments']:
-        print line
-    print "***********************************"
-    print "You have entered the following tikzlibraries"
-    print "***********************************"
-    print node['libs']
-    print "\n***********************************"
-    print "You have entered the following text"
-    print "***********************************"
-    print node['tikz']
-    print "***********************************"
+    # print "\n***********************************"
+    # print "You have entered the following argument"
+    # print "***********************************"
+    # print node['caption']
+    # print "***********************************"
+    # print "You have entered the following tikzlibraries"
+    # print "***********************************"
+    # print node['libs']
+    # print "\n***********************************"
+    # print "You have entered the following tikz-code"
+    # print "***********************************"
+    # print node['tikz']
+    # print "***********************************"
+
     try:
-        fname = render_tikz(self,node)
+        fname = render_tikz(self,node['tikz'],node['libs'])
     except TikzExtError, exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
@@ -197,8 +197,12 @@ def html_visit_tikz(self,node):
     else:
         self.body.append(self.starttag(node, 'div', CLASS='math'))
         self.body.append('<p>')
-        self.body.append('<img src="%s" alt="%s" /></p>\n</div>' %
+        self.body.append('<img src="%s" alt="%s" /></p>\n' %
                          (fname, self.encode(node['tikz']).strip()))
+        if node['caption']:
+            self.body.append('<center>%s</center>' % \
+                             self.encode(node['caption']).strip())
+        self.body.append('</div>')
         raise nodes.SkipNode
 
 def depart_tikz(self,node):
