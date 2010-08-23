@@ -186,12 +186,12 @@ def html_visit_tikz(self,node):
         self.body.append('<span class="math">%s</span>' %
                          self.encode(node['tikz']).strip())
     else:
-        self.body.append(self.starttag(node, 'div', CLASS='math'))
+        self.body.append(self.starttag(node, 'div', CLASS='figure'))
         self.body.append('<p>')
         self.body.append('<img src="%s" alt="%s" /></p>\n' %
                          (fname, self.encode(node['tikz']).strip()))
         if node['caption']:
-            self.body.append('<center>%s</center>' % \
+            self.body.append('<p class="caption">%s</p>' % \
                              self.encode(node['caption']).strip())
         self.body.append('</div>')
         raise nodes.SkipNode
