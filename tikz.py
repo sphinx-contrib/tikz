@@ -205,6 +205,16 @@ def html_visit_tikz(self,node):
         self.body.append('</div>')
         raise nodes.SkipNode
 
+def latex_visit_tikz(self, node):
+    if node['caption']:
+        latex = '\\begin{figure}[htp]\\centering\\begin{tikzpicture}' + \
+                node['tikz'] + '\\end{tikzpicture}' + '\\caption{' + \
+                self.encode(node['caption']).strip() + '}\\end{figure}'
+    else:
+        latex = '\\begin{center}\\begin{tikzpicture}' + node['tikz'] + \
+            '\\end{tikzpicture}\\end{center}'
+    self.body.append(latex)
+
 def depart_tikz(self,node):
     pass
 
@@ -220,6 +230,7 @@ def cleanup_tempdir(app, exc):
 
 def setup(app):
     app.add_node(tikz,
-                 html=(html_visit_tikz, depart_tikz))
+                 html=(html_visit_tikz, depart_tikz),
+                 latex=(latex_visit_tikz, depart_tikz))
     app.add_directive('tikz', TikzDirective)
     app.connect('build-finished', cleanup_tempdir)
