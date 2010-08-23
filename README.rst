@@ -1,6 +1,6 @@
-============================================
- Description of the 'tikz' Sphinx extension
-============================================
+==============================================
+ Description of the ``tikz`` Sphinx extension
+==============================================
 
 Enable the use of the TikZ LaTeX package to draw nice pictures.
 
@@ -17,11 +17,11 @@ In the Sphinx project configuration file ``conf.py`` you need to:
 
 - add the directory where ``tikz.py`` is located to ``sys.path``, e.g. by::
 
-  sys.path.append('<absolute path to directory>')
+    sys.path.append('‹absolute path to directory›')
 
 - load the extension by::
 
-  extensions = ['tikz']
+    extensions = ['tikz']
 
 If you want to produce latex code then you should add the ``tikz`` package and
 all ``tikzlibraries`` to the latex preamble in ``conf.py``, e.g::
@@ -36,20 +36,20 @@ Usage
 
 The extension adds a ``tikz``-directive which look as follows::
 
-  .. tikz:: <caption potentially broken
-     across lines>
-     :libs: <tikzlibraries>
+  .. tikz:: ‹caption potentially broken
+     across lines›
+     :libs: ‹tikz libraries›
 
-     <tikz code>
+     ‹tikz code›
 
 The caption is optional, but if present is printed as a picture caption centered
 below the picture.
 
-The option ``:libs:`` is a comma separated list of tikzlibraries to use.  If you
-want to build latex code then make sure that you add these to ``latex_preamble``
-in ``conf.py``.
+The ``‹tikz libraries›`` option is a comma separated list of tikz libraries to
+use.  If you want to build latex code then make sure that you add these to
+``latex_preamble`` in ``conf.py``.
 
-The tikz-code finally is code according to the tikz latex package.
+The ``‹tikz code›`` finally is code according to the tikz latex package.
 
 ----
 
