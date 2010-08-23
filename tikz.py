@@ -3,24 +3,23 @@
 # A picture drawing directive using TikZ
 
 # Todo:
-# - In the beginning no build/html/_images directory exists and pstoimg fails.
 # - If something fails, e.g. a syntax error in the latex code then only there is
 #   no feedback.
-# - The extension has a stupid name
 
 import tempfile
 import posixpath
 from os import path, getcwd, chdir, mkdir, system
 from subprocess import Popen, PIPE
-
 try:
     from hashlib import sha1 as sha
 except ImportError:
     from sha import sha
 
 from docutils import nodes
+from docutils.parsers.rst import directives
+
+from sphinx.util import ensuredir, ENOENT, EPIPE
 from sphinx.util.compat import Directive
-from sphinx.util import ENOENT
 
 
 class tikz(nodes.General, nodes.Element):
@@ -28,12 +27,16 @@ class tikz(nodes.General, nodes.Element):
 
 class TikzDirective(Directive):
     has_content = True
-    optional_arguments = 2
+    required_arguments = 0
+    optional_arguments = 1
+    final_argument_whitespace = True
+    option_spec = {'libs':directives.unchanged}
 
     def run(self):
         node = tikz()
         node['code'] = '\n'.join(self.content)
         node['arguments'] = self.arguments
+        node['libs'] = self.options.get('libs', None)
         return [node]
 
 DOC_HEAD = r'''
@@ -45,7 +48,7 @@ DOC_HEAD = r'''
 \usepackage{amsfonts}
 \usepackage{bm}
 \usepackage{tikz}
-\usetikzlibrary{arrows}
+%s
 \pagestyle{empty}
 '''
 
@@ -59,11 +62,14 @@ DOC_BODY = r'''
 
 def html_visit_tikz(self,node):
     print "\n***********************************"
-    print "You have entered the following arguments"
+    print "You have entered the following argument"
     print "***********************************"
     for line in node['arguments']:
         print line
     print "***********************************"
+    print "You have entered the following tikzlibraries"
+    print "***********************************"
+    print node['libs']
     print "\n***********************************"
     print "You have entered the following text"
     print "***********************************"
@@ -71,19 +77,25 @@ def html_visit_tikz(self,node):
     print "***********************************"
     hashkey = node['code'].encode('utf-8')
     fname = 'tikz-%s.png' % (sha(hashkey).hexdigest())
-    print fname
     if hasattr(self.builder, 'imgpath'):
-        # HTML
+        # 'HTML'
         relfn = posixpath.join(self.builder.imgpath, fname)
         outfn = path.join(self.builder.outdir, '_images', fname)
     else:
-        # LaTeX
+        # 'LaTeX'
         relfn = fname
         outfn = path.join(self.builder.outdir, fname)
+        
     print relfn
     print outfn
 
-    latex = DOC_HEAD + DOC_BODY % node['code']
+    ensuredir(path.dirname(outfn))
+
+    libs = ''
+    if node['libs']:
+        libs = '\usetikzlibrary{' + node['libs'] + '}'
+
+    latex = DOC_HEAD % libs + DOC_BODY % node['code']
     if isinstance(latex, unicode):
         latex = latex.encode('utf-8')
 
