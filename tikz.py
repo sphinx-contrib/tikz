@@ -40,7 +40,8 @@ class TikzDirective(Directive):
         node = tikz()
         node['tikz'] = '\n'.join(self.content)
         node['caption'] = '\n'.join(self.arguments)
-        node['libs'] = self.options.get('libs', None)
+        libs = self.options.get('libs', '')
+        node['libs'] = libs.replace(' ', '').replace('\t', '')
         return [node]
 
 DOC_HEAD = r'''
@@ -52,7 +53,7 @@ DOC_HEAD = r'''
 \usepackage{amsfonts}
 \usepackage{bm}
 \usepackage{tikz}
-%s
+\usetikzlibrary{%s}
 \pagestyle{empty}
 '''
 
@@ -67,14 +68,8 @@ DOC_BODY = r'''
 def render_tikz(self,tikz,libs):
     hashkey = tikz.encode('utf-8')
     fname = 'tikz-%s.png' % (sha(hashkey).hexdigest())
-    if hasattr(self.builder, 'imgpath'):
-        # 'HTML'
-        relfn = posixpath.join(self.builder.imgpath, fname)
-        outfn = path.join(self.builder.outdir, '_images', fname)
-    else:
-        # 'LaTeX'
-        relfn = fname
-        outfn = path.join(self.builder.outdir, fname)
+    relfn = posixpath.join(self.builder.imgpath, fname)
+    outfn = path.join(self.builder.outdir, '_images', fname)
 
     if path.isfile(outfn):
         return relfn
@@ -86,11 +81,7 @@ def render_tikz(self,tikz,libs):
     
     ensuredir(path.dirname(outfn))
 
-    libraries = ''
-    if libs:
-        libraries = '\usetikzlibrary{' + libs + '}'
-
-    latex = DOC_HEAD % libraries + DOC_BODY % tikz
+    latex = DOC_HEAD % libs + DOC_BODY % tikz
     if isinstance(latex, unicode):
         latex = latex.encode('utf-8')
 
