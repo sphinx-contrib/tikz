@@ -11,7 +11,8 @@ You need ``latex``, the ``tikz`` and the ``amsmath`` packages, ``dvips`` and
 ``pstoimg``.  We don't use ``dvipng`` as the math Sphinx extensions do because
 there is an issue with cropping the image if postscript specials are used.
 
-The ``tikz`` Sphinx extension consists of the single file ``tikz.py``.
+The ``tikz`` Sphinx extension consists of the single file ``tikz.py`` (along
+with this README file).
 
 In the Sphinx project configuration file ``conf.py`` you need to:
 
@@ -22,6 +23,12 @@ In the Sphinx project configuration file ``conf.py`` you need to:
 - load the extension by::
 
     extensions = ['tikz']
+
+One configuration value is supported::
+
+  tikz_latex_preamble = ‹string›
+
+This adds the ``‹string›`` to the latex preamble.
 
 If you want to produce latex code then you should add the ``tikz`` package and
 all ``tikzlibraries`` to the latex preamble in ``conf.py``, e.g::
