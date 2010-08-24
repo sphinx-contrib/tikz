@@ -40,8 +40,7 @@ class TikzDirective(Directive):
         node = tikz()
         node['tikz'] = '\n'.join(self.content)
         node['caption'] = '\n'.join(self.arguments)
-        libs = self.options.get('libs', '')
-        node['libs'] = libs.replace(' ', '').replace('\t', '')
+        node['libs'] = self.options.get('libs', '')
         return [node]
 
 DOC_HEAD = r'''
@@ -174,8 +173,11 @@ def html_visit_tikz(self,node):
     # print node['tikz']
     # print "***********************************"
 
+    libs = self.builder.config.tikz_tikzlibraries + ',' + node['libs']
+    libs = libs.replace(' ', '').replace('\t', '').strip(', ')
+
     try:
-        fname = render_tikz(self,node['tikz'],node['libs'])
+        fname = render_tikz(self,node['tikz'],libs)
     except TikzExtError, exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
@@ -227,4 +229,5 @@ def setup(app):
                  latex=(latex_visit_tikz, depart_tikz))
     app.add_directive('tikz', TikzDirective)
     app.add_config_value('tikz_latex_preamble', '', 'html')
+    app.add_config_value('tikz_tikzlibraries', '', 'html')
     app.connect('build-finished', cleanup_tempdir)
