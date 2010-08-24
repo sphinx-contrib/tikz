@@ -17,7 +17,7 @@ In the Sphinx project configuration file ``conf.py`` you need to:
 
 - add the directory where ``tikz.py`` is located to ``sys.path``, e.g. by::
 
-    sys.path.append('‹absolute path to directory›')
+    sys.path.append(os.path.expanduser('~/‹path to directory›'))
 
 - load the extension by::
 
