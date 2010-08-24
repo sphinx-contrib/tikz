@@ -81,7 +81,9 @@ def render_tikz(self,tikz,libs):
     
     ensuredir(path.dirname(outfn))
 
-    latex = DOC_HEAD % libs + DOC_BODY % tikz
+    latex = DOC_HEAD % libs
+    latex += self.builder.config.tikz_latex_preamble
+    latex += DOC_BODY % tikz
     if isinstance(latex, unicode):
         latex = latex.encode('utf-8')
 
@@ -224,4 +226,5 @@ def setup(app):
                  html=(html_visit_tikz, depart_tikz),
                  latex=(latex_visit_tikz, depart_tikz))
     app.add_directive('tikz', TikzDirective)
+    app.add_config_value('tikz_latex_preamble', '', 'html')
     app.connect('build-finished', cleanup_tempdir)
