@@ -9,7 +9,7 @@
     Author: Christoph Reller
     Email: creller@ee.ethz.ch
     Version: 0.1
-    subversion: $Date$ $Revision$
+    subversion: $Date: 2010-12-17 15:32:57 +0100 (Fri, 17 Dec 2010) $ $Revision$
 """    
 
 import tempfile
