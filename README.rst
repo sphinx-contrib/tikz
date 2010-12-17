@@ -2,7 +2,10 @@
  Description of the ``tikz`` Sphinx extension
 ==============================================
 
-Enable the use of the TikZ LaTeX package to draw nice pictures.
+This extension to `Sphinx <http://sphinx.pocoo.org/>`_ enables the use of the
+`PGF/TikZ LaTeX package
+<http://www.ctan.org/tex-archive/graphics/pgf/base/doc/generic/pgf/pgfmanual.pdf>`_
+to draw nice pictures.
 
 ----
 
