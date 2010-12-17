@@ -5,6 +5,11 @@
     ~~~~
 
     Render TikZ pictures via dvips and pstoimg
+
+    Author: Christoph Reller
+    Email: creller@ee.ethz.ch
+    Version: 0.1
+    subversion: $Date$ $Revision$
 """    
 
 import tempfile
