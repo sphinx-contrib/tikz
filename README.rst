@@ -4,6 +4,11 @@
 
 Enable the use of the TikZ LaTeX package to draw nice pictures.
 
+----
+
+:Version: 0.1
+:Author: Christoph Reller ``creller@ee.ethz.ch``
+
 Prerequisites
 =============
 
@@ -56,8 +61,15 @@ The ``‹tikz libraries›`` option is a comma separated list of tikz libraries 
 use.  If you want to build latex code then make sure that you add these to
 ``latex_preamble`` in ``conf.py``.
 
-The ``‹tikz code›`` finally is code according to the tikz latex package.
+The ``‹tikz code›`` finally is code according to the tikz latex package.  It
+behaves as if inside a ``tikzpicture`` environment.
 
-----
+Examples
+========
 
-Christoph Reller
+::
+
+  .. tikz:: A Simple Example
+
+     \draw[thick,rounded corners=8pt]
+     (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
