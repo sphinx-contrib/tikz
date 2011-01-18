@@ -26,7 +26,11 @@ from docutils import nodes
 from docutils.parsers.rst import directives
 
 from sphinx.errors import SphinxError
-from sphinx.util import ensuredir, ENOENT, EPIPE
+try:
+    from sphinx.util.osutil import ensuredir, ENOENT, EPIPE
+except:
+    from sphinx.util import ensuredir, ENOENT, EPIPE
+    
 from sphinx.util.compat import Directive
 
 class TikzExtError(SphinxError):
