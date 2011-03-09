@@ -4,19 +4,28 @@
     tikz
     ~~~~
 
-    Render TikZ pictures via dvips and pstoimg
+    Render TikZ pictures
+
+    We make use of
+
+    * latex
+    * pdftoppm (part of Poppler)
+    * pnmcrop (part of Netpbm)
+    * pnmtopng (part of Netpbm)
 
     Author: Christoph Reller
     Email: creller@ee.ethz.ch
-    Version: 0.1
+    Version: 0.2
     $Date: 2010-12-17 15:32:57 +0100 (Fri, 17 Dec 2010) $
     $Revision$
 """    
 
 import tempfile
 import posixpath
+import shutil
+import sys
 from os import path, getcwd, chdir, mkdir, system
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, call
 try:
     from hashlib import sha1 as sha
 except ImportError:
@@ -83,9 +92,7 @@ def render_tikz(self,tikz,libs):
     if path.isfile(outfn):
         return relfn
 
-    if hasattr(self.builder, '_tikz_warned_latex') or \
-       hasattr(self.builder, '_tikz_warned_pvips') or \
-       hasattr(self.builder, '_tikz_warned_pstoimg'):
+    if hasattr(self.builder, '_tikz_warned'):
         return None
     
     ensuredir(path.dirname(outfn))
@@ -107,18 +114,16 @@ def render_tikz(self,tikz,libs):
     tf = open('tikz.tex', 'w')
     tf.write(latex)
     tf.close()
-    system('cp tikz.tex /tmp')
-
-    latex_args = ['latex', '--interaction=nonstopmode', 'tikz.tex']
 
     try:
         try:
-            p = Popen(latex_args, stdout=PIPE, stderr=PIPE)
+            p = Popen(['pdflatex', '--interaction=nonstopmode', 'tikz.tex'],
+                      stdout=PIPE, stderr=PIPE)
         except OSError, err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
             self.builder.warn('LaTeX command cannot be run')
-            self.builder._tikz_warned_latex = True
+            self.builder._tikz_warned = True
             return None
     finally:
         chdir(curdir)
@@ -130,42 +135,56 @@ def render_tikz(self,tikz,libs):
 
     chdir(tempdir)
 
-    dvips_args = ['dvips', 'tikz.dvi']
     try:
-        p = Popen(dvips_args, stdout=PIPE, stderr=PIPE)
-    except OSError, err:
-        if err.errno != ENOENT:   # No such file or directory
+        p = Popen(['pdftoppm', '-r', '105', 'tikz.pdf', 'tikz'],
+                  stdout=PIPE, stderr=PIPE)
+    except OSError, e:
+        if e.errno != ENOENT:   # No such file or directory
             raise
-        self.builder.warn('dvips command cannot be run')
-        self.builder._tikz_warned_pvips = True
+        self.builder.warn('pdftoppm command cannot be run')
+        self.builder.warn(err)
+        self.builder._tikz_warned = True
         return None
-    finally:
-        chdir(curdir)
     stdout, stderr = p.communicate()
     if p.returncode != 0:
-        raise TikzExtError('dvips exited with error:\n[stderr]\n%s\n'
+        self.builder._tikz_warned = True
+        raise TikzExtError('pdftoppm exited with error:\n[stderr]\n%s\n'
                            '[stdout]\n%s' % (stderr, stdout))
 
-    chdir(tempdir)
-
-    pstoimg_args = ['pstoimg', '-type', 'png', '-scale', '1.64', \
-                    '-antialias', '-aaliastext', '-crop', 'a']
-    pstoimg_args += ['-out', outfn, 'tikz.ps']
     try:
-        p = Popen(pstoimg_args, stdout=PIPE, stderr=PIPE)
+        p1 = Popen(['pnmcrop', 'tikz-1.ppm'], stdout=PIPE, stderr=PIPE)
     except OSError, err:
         if err.errno != ENOENT:   # No such file or directory
             raise
-        self.builder.warn('pstoimg command cannot be run')
-        self.builder._tikz_warned_pstoimg = True
-        return
-    finally:
-        chdir(curdir)
-    stdout, stderr = p.communicate()
-    if p.returncode != 0:
-        raise TikzExtError('pstoimg exited with error:\n[stderr]\n%s\n'
-                           '[stdout]\n%s' % (stderr, stdout))
+        self.builder.warn('pnmcrop command cannot be run:')
+        self.builder.warn(err)
+        self.builder._tikz_warned = True
+        return None
 
+    try:
+        p2 = Popen(['pnmtopng', '-transparent', 'white'],
+                   stdin=p1.stdout, stdout=PIPE, stderr=PIPE)
+    except OSError, err:
+        if err.errno != ENOENT:   # No such file or directory
+            raise
+        self.builder.warn('pnmtopng command cannot be run:')
+        self.builder.warn(err)
+        self.builder._tikz_warned = True
+        return None
+
+    pngdata, stderr2 = p2.communicate()
+    dummy, stderr1 = p1.communicate()
+    if p1.returncode != 0:
+        self.builder._tikz_warned = True
+        raise TikzExtError('pnmcrop exited with error:\n[stderr]\n%s'
+                           % (stderr1))
+    if p2.returncode != 0:
+        self.builder._tikz_warned = True
+        raise TikzExtError('pnmtopng exited with error:\n[stderr]\n%s'
+                           % (stderr2))
+    f = open(outfn,'wb')
+    f.write(pngdata)
+    f.close()
     return relfn
 
 def html_visit_tikz(self,node):
@@ -193,7 +212,7 @@ def html_visit_tikz(self,node):
         sm = nodes.system_message(info, type='WARNING', level=2,
                                   backrefs=[], source=node['tikz'])
         sm.walkabout(self)
-        self.builder.warn('display latex %r: ' % node['tikz'] + str(exc))
+        self.builder.warn('display latex %r: \n' % node['tikz'] + str(exc))
         raise nodes.SkipNode
     if fname is None:
         # something failed -- use text-only as a bad substitute
