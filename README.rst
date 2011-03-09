@@ -79,3 +79,11 @@ Examples
 
      \draw[thick,rounded corners=8pt]
      (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
+
+Caveats
+=======
+
+If you use the ``.. tikz::`` directive inside of a table or a sidebar and you
+specify a caption then the latex target built by the sphinx builder will not
+compile.  This is because, as soon as you specify a caption, the ``tikzpicture``
+environment is set inside a ``figure`` environment and hence it is a float.
