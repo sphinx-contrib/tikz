@@ -9,15 +9,20 @@ to draw nice pictures.
 
 ----
 
-:Version: 0.1
+:Version: 0.2
 :Author: Christoph Reller ``creller@ee.ethz.ch``
 
-Prerequisites
-=============
+Prerequisites and Configuration
+===============================
 
-You need ``latex``, the ``tikz`` and the ``amsmath`` packages, ``dvips`` and
-``pstoimg``.  We don't use ``dvipng`` as the math Sphinx extensions do because
-there is an issue with cropping the image if postscript specials are used.
+On your computer the following must be installed:
+
+* ``latex`` with the ``tikz`` and the ``amsmath`` packages
+* ``pdftoppm`` (part of the Poppler pdf library)
+* ``pnmcrop`` and ``pnmtopng`` (both part of the Netpbm package)
+
+(We don't use ``dvipng`` as the math Sphinx extensions do because
+there is an issue with cropping the image if postscript specials are used.)
 
 The ``tikz`` Sphinx extension consists of the single file ``tikz.py`` (along
 with this README file).
@@ -32,24 +37,21 @@ In the Sphinx project configuration file ``conf.py`` you need to:
 
     extensions = ['tikz']
 
-One configuration value is supported::
+The following configuration strings are supported:
 
-  tikz_latex_preamble = ‹string›
+* To add ``‹string›`` to the latex preamble::
 
-This adds the ``‹string›`` to the latex preamble.
+    tikz_latex_preamble = ‹string›
 
-If you want to produce latex code then you should add the ``tikz`` package and
-all ``tikzlibraries`` to the latex preamble in ``conf.py``, e.g::
+* To add ``\usetikzlibrary{‹string›}`` to the latex preamble::
 
-  latex_preamble = '''
-  \usepackage{tikz}
-  \usetikzlibrary{arrows,fit}
-  '''
+    tikz_tikzlibraries = ‹string›
+
 
 Usage
 =====
 
-The extension adds a ``tikz``-directive which look as follows::
+The extension adds a ``tikz``-directive which is used as follows::
 
   .. tikz:: ‹caption potentially broken
      across lines›
@@ -65,7 +67,8 @@ use.  If you want to build latex code then make sure that you add these to
 ``latex_preamble`` in ``conf.py``.
 
 The ``‹tikz code›`` finally is code according to the tikz latex package.  It
-behaves as if inside a ``tikzpicture`` environment.
+behaves as if inside a ``tikzpicture`` environment.  Note that there must be an
+empty line in front of ``‹tikz code›``.
 
 Examples
 ========
