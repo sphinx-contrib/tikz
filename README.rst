@@ -59,8 +59,8 @@ The extension adds a ``tikz``-directive which is used as follows::
 
      ‹tikz code›
 
-The caption is optional, but if present is printed as a picture caption centered
-below the picture.
+The caption is optional, but if present it is printed as a picture caption
+centered below the picture.
 
 The ``‹tikz libraries›`` option is a comma separated list of tikz libraries to
 use.  If you want to build latex code then make sure that you add these to
