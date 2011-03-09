@@ -47,6 +47,15 @@ The following configuration strings are supported:
 
     tikz_tikzlibraries = ‹string›
 
+  You might want to add the ``tikzlibraries`` in the ``latex_preamble``
+  e.g. as::
+
+    latex_preamble = '''
+    ‹...›
+    \usepackage{tikz}
+    \usetikzlibrary{''' + tikz_tikzlibraries + '''}
+    ‹...›
+    '''
 
 Usage
 =====
@@ -83,7 +92,7 @@ Examples
 Caveats
 =======
 
-If you use the ``.. tikz::`` directive inside of a table or a sidebar and you
-specify a caption then the latex target built by the sphinx builder will not
-compile.  This is because, as soon as you specify a caption, the ``tikzpicture``
+If you use the ``tikz`` directive inside of a table or a sidebar and you specify
+a caption then the latex target built by the sphinx builder will not compile.
+This is because, as soon as you specify a caption, the ``tikzpicture``
 environment is set inside a ``figure`` environment and hence it is a float.
