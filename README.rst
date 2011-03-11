@@ -37,7 +37,11 @@ In the Sphinx project configuration file ``conf.py`` you need to:
 
     extensions = ['tikz']
 
-The following configuration strings are supported:
+The following configuration values are supported:
+
+* To enable/disable transparent graphics (enabled by default)::
+
+    tikz_transparent = ‹True or False›
 
 * To add ``‹string›`` to the latex preamble::
 
