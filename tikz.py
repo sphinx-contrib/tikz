@@ -136,7 +136,7 @@ def render_tikz(self,tikz,libs):
     chdir(tempdir)
 
     try:
-        p = Popen(['pdftoppm', '-r', '105', 'tikz.pdf', 'tikz'],
+        p = Popen(['pdftoppm', '-r', '120', 'tikz.pdf', 'tikz'],
                   stdout=PIPE, stderr=PIPE)
     except OSError, e:
         if e.errno != ENOENT:   # No such file or directory
