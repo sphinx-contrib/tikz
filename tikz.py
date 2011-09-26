@@ -96,10 +96,12 @@ def render_tikz(self,tikz,libs):
         return None
     
     ensuredir(path.dirname(outfn))
+    curdir = getcwd()
 
     latex = DOC_HEAD % libs
     latex += self.builder.config.tikz_latex_preamble
-    latex += DOC_BODY % tikz
+    tikzz = tikz % {'wd': curdir}
+    latex += DOC_BODY % tikzz
     if isinstance(latex, unicode):
         latex = latex.encode('utf-8')
 
@@ -108,7 +110,6 @@ def render_tikz(self,tikz,libs):
     else:
         tempdir = self.builder._tikz_tempdir
 
-    curdir = getcwd()
     chdir(tempdir)
 
     tf = open('tikz.tex', 'w')
@@ -144,6 +145,7 @@ def render_tikz(self,tikz,libs):
         self.builder.warn('pdftoppm command cannot be run')
         self.builder.warn(err)
         self.builder._tikz_warned = True
+        chdir(curdir)
         return None
     stdout, stderr = p.communicate()
     if p.returncode != 0:
@@ -159,6 +161,7 @@ def render_tikz(self,tikz,libs):
         self.builder.warn('pnmcrop command cannot be run:')
         self.builder.warn(err)
         self.builder._tikz_warned = True
+        chdir(curdir)
         return None
 
     if self.builder.config.tikz_transparent:
@@ -174,6 +177,7 @@ def render_tikz(self,tikz,libs):
         self.builder.warn('pnmtopng command cannot be run:')
         self.builder.warn(err)
         self.builder._tikz_warned = True
+        chdir(curdir)
         return None
 
     pngdata, stderr2 = p2.communicate()
@@ -189,6 +193,7 @@ def render_tikz(self,tikz,libs):
     f = open(outfn,'wb')
     f.write(pngdata)
     f.close()
+    chdir(curdir)
     return relfn
 
 def html_visit_tikz(self,node):
