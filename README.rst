@@ -2,15 +2,22 @@
  Description of the ``tikz`` Sphinx extension
 ==============================================
 
-This extension to `Sphinx <http://sphinx.pocoo.org/>`_ enables the use of the
-`PGF/TikZ LaTeX package
-<http://www.ctan.org/tex-archive/graphics/pgf/base/doc/generic/pgf/pgfmanual.pdf>`_
-to draw nice pictures.
+This extension to `Sphinx <http://sphinx.pocoo.org/>`__ enables the use of the
+PGF/TikZ LaTeX package to draw nice pictures.  (See `CTAN
+<http://www.ctan.org/tex-archive/graphics/pgf/>`__ or `sourceforge
+<http://sourceforge.net/projects/pgf/>`__; the manual is, e.g., `here
+<http://www.ctan.org/tex-archive/graphics/pgf/base/doc/generic/pgf/pgfmanual.pdf>`__.)
+Have also a look at contributions such as `pgfplots
+<http://www.ctan.org/tex-archive/graphics/pgf/contrib/pgfplots/>`__.
+
+Use the extension at your own risk.  Anything might change in future versions
+without further notice.
 
 ----
 
 :Version: 0.2
 :Author: Christoph Reller ``creller@ee.ethz.ch``
+:Download: `tikz.py <../_static/tikz.py>`__
 
 Prerequisites and Configuration
 ===============================
@@ -21,11 +28,11 @@ On your computer the following must be installed:
 * ``pdftoppm`` (part of the Poppler pdf library)
 * ``pnmcrop`` and ``pnmtopng`` (both part of the Netpbm package)
 
-(We don't use ``dvipng`` as the math Sphinx extensions do because
-there is an issue with cropping the image if postscript specials are used.)
+(We cannot use ``dvipng`` as the math Sphinx extensions do because there is an
+issue with cropping the image if postscript specials are used.)
 
 The ``tikz`` Sphinx extension consists of the single file ``tikz.py`` (along
-with this README file).
+with this description).
 
 In the Sphinx project configuration file ``conf.py`` you need to:
 
@@ -79,12 +86,15 @@ The ``‹tikz libraries›`` option is a comma separated list of tikz libraries 
 use.  If you want to build latex code then make sure that you add these to
 ``latex_preamble`` in ``conf.py``.
 
-The ``‹tikz code›`` finally is code according to the tikz latex package.  It
-behaves as if inside a ``tikzpicture`` environment.  Note that there must be an
-empty line in front of ``‹tikz code›``.
+The ``‹tikz code›`` is code according to the tikz latex package.  It behaves as
+if inside a ``tikzpicture`` environment with one enhancement: The string
+``%(wd)s`` will be replaced by the project root directory.  This is convenient
+when referring to some source file in the LaTeX code.
 
-Examples
-========
+Note that there must be an empty line in front of ``‹tikz code›``.
+
+Example
+=======
 
 ::
 
@@ -92,6 +102,11 @@ Examples
 
      \draw[thick,rounded corners=8pt]
      (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
+
+.. tikz:: A Simple Example
+
+   \draw[thick,rounded corners=8pt]
+   (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
 
 Caveats
 =======
