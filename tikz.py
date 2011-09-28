@@ -15,7 +15,7 @@
 
     Author: Christoph Reller
     Email: creller@ee.ethz.ch
-    Version: 0.2
+    Version: 0.3
     $Date: 2010-12-17 15:32:57 +0100 (Fri, 17 Dec 2010) $
     $Revision$
 """    
@@ -31,7 +31,7 @@ try:
 except ImportError:
     from sha import sha
 
-from docutils import nodes
+from docutils import nodes, utils
 from docutils.parsers.rst import directives
 
 from sphinx.errors import SphinxError
@@ -45,7 +45,14 @@ from sphinx.util.compat import Directive
 class TikzExtError(SphinxError):
     category = 'Tikz extension error'
 
-class tikz(nodes.General, nodes.Element):
+class tikzinline(nodes.Inline, nodes.Element):
+    pass
+
+def tikz_role(role, rawtext, text, lineno, inliner, option={}, content=[]):
+    tikz = utils.unescape(text, restore_backslashes=True)
+    return [tikzinline(tikz=tikz)], []
+
+class tikz(nodes.Part, nodes.Element):
     pass
 
 class TikzDirective(Directive):
@@ -83,7 +90,7 @@ DOC_BODY = r'''
 \end{document}
 '''
 
-def render_tikz(self,tikz,libs):
+def render_tikz(self,tikz,libs=''):
     hashkey = tikz.encode('utf-8')
     fname = 'tikz-%s.png' % (sha(hashkey).hexdigest())
     relfn = posixpath.join(self.builder.imgpath, fname)
@@ -196,6 +203,27 @@ def render_tikz(self,tikz,libs):
     chdir(curdir)
     return relfn
 
+def html_visit_tikzinline(self,node):
+    libs = self.builder.config.tikz_tikzlibraries
+    libs = libs.replace(' ', '').replace('\t', '').strip(', ')
+    try:
+        fname = render_tikz(self,node['tikz'],libs);
+    except TikzExtError, exc:
+        info = str(exc)[str(exc).find('!'):-1]
+        sm = nodes.system_message(info, type='WARNING', level=2,
+                                  backrefs=[], source=node['tikz'])
+        sm.walkabout(self)
+        self.builder.warn('display latex %r: \n' % node['tikz'] + str(exc))
+        raise nodes.SkipNode
+    if fname is None:
+        # something failed -- use text-only as a bad substitute
+        self.body.append('<span class="math">%s</span>' %
+                         self.encode(node['tikz']).strip())
+    else:
+        self.body.append('<img class="math" src="%s" alt="%s"/>' %
+                         (fname, self.encode(node['tikz']).strip()))
+        raise nodes.SkipNode
+
 def html_visit_tikz(self,node):
     # print "\n***********************************"
     # print "You have entered the following argument"
@@ -238,6 +266,22 @@ def html_visit_tikz(self,node):
         self.body.append('</div>')
         raise nodes.SkipNode
 
+def latex_visit_tikzinline(self, node):
+    tikz = node['tikz']
+    if tikz[0] == '[':
+        cnt,pos = 1,1
+        while cnt > 0 and cnt < len(tikz):
+            if tikz[pos] == '[':
+                cnt = cnt + 1
+            if tikz[pos] == ']':
+                cnt = cnt - 1
+            pos = pos + 1
+        tikz = tikz[:pos] + '{' + tikz[pos:]
+    else:
+        tikz = '{' + tikz
+    self.body.append('\\tikz' + tikz + '}')
+    raise nodes.SkipNode
+
 def latex_visit_tikz(self, node):
     if node['caption']:
         latex = '\\begin{figure}[htp]\\centering\\begin{tikzpicture}' + \
@@ -265,6 +309,10 @@ def setup(app):
     app.add_node(tikz,
                  html=(html_visit_tikz, depart_tikz),
                  latex=(latex_visit_tikz, depart_tikz))
+    app.add_node(tikzinline,
+                 html=(html_visit_tikzinline, depart_tikz),
+                 latex=(latex_visit_tikzinline, depart_tikz))
+    app.add_role('tikz', tikz_role)
     app.add_directive('tikz', TikzDirective)
     app.add_config_value('tikz_latex_preamble', '', 'html')
     app.add_config_value('tikz_tikzlibraries', '', 'html')
