@@ -15,7 +15,7 @@ without further notice.
 
 ----
 
-:Version: 0.2
+:Version: 0.3
 :Author: Christoph Reller ``creller@ee.ethz.ch``
 :Download: `tikz.py <../_static/tikz.py>`__
 
@@ -71,7 +71,9 @@ The following configuration values are supported:
 Usage
 =====
 
-The extension adds a ``tikz``-directive which is used as follows::
+The extension adds a ``tikz``-directive and a ``tikz``-role.  
+
+The **tikz-directive** is used as follows::
 
   .. tikz:: ‹caption potentially broken
      across lines›
@@ -93,20 +95,37 @@ when referring to some source file in the LaTeX code.
 
 Note that there must be an empty line in front of ``‹tikz code›``.
 
-Example
-=======
+The **tikz-role** is used as follows::
+
+  :tikz:`‹tikz code›`
+
+The ``‹tikz code›`` is code according to the tikz latex package.  It behaves as
+if inside a ``\tikz`` macro.  TikZ options can be given at the start of the
+``‹tikz code›``.
+
+Examples
+========
 
 ::
 
-  .. tikz:: A Simple Example
+  .. tikz:: An example directive
 
      \draw[thick,rounded corners=8pt]
      (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
 
-.. tikz:: A Simple Example
+.. tikz:: An example directive
 
    \draw[thick,rounded corners=8pt]
    (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
+
+::
+
+  An example role :tikz:`[thick] \node[draw] (a) {A}; 
+  \node[draw,dotted,right of=a] {B} edge[<-] (a);`
+
+
+An example role :tikz:`[thick] \node[draw] (a) {A}; \node[draw,dotted,right
+of=a] {B} edge[<-] (a);`
 
 Caveats
 =======
