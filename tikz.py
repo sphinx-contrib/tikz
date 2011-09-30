@@ -210,7 +210,7 @@ def render_tikz(self,tikz,libs=''):
             chdir(curdir)
             return None
         stdout, stderr = p1.communicate()
-        if p.returncode != 0:
+        if p1.returncode != 0:
             self.builder._tikz_warned = True
             chdir(curdir)
             raise TikzExtError('Error (tikz extension): convert exited with '
