@@ -365,10 +365,10 @@ def cleanup_tempdir(app, exc):
         return
     if not hasattr(app.builder, '_tikz_tempdir'):
         return
-    # try:
-    #     shutil.rmtree(app.builder._tikz_tempdir)
-    # except Exception:
-    #     pass
+    try:
+        shutil.rmtree(app.builder._tikz_tempdir)
+    except Exception:
+        pass
 
 def setup(app):
     app.add_node(tikz,
