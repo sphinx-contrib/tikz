@@ -1,5 +1,5 @@
 ==============================================
- Description of the ``tikz`` Sphinx extension
+ Description of the ``tikz`` Sphinx Extension
 ==============================================
 
 This extension to `Sphinx <http://sphinx.pocoo.org/>`__ enables the use of the
@@ -15,9 +15,10 @@ without further notice.
 
 ----
 
-:Version: 0.3
+:Version: 0.4
 :Author: Christoph Reller ``creller@ee.ethz.ch``
 :Download: `tikz.py <../_static/tikz.py>`__
+:License: `BSD License <http://opensource.org/licenses/bsd-license.html>`__
 
 Prerequisites and Configuration
 ===============================
@@ -26,7 +27,10 @@ On your computer the following must be installed:
 
 * ``latex`` with the ``tikz`` and the ``amsmath`` packages
 * ``pdftoppm`` (part of the Poppler pdf library)
-* ``pnmcrop`` and ``pnmtopng`` (both part of the Netpbm package)
+* either of the following:
+
+  - ``pnmcrop`` and ``pnmtopng`` (both part of the Netpbm package)
+  - ``convert`` (part of the ImageMagick package)
 
 (We cannot use ``dvipng`` as the math Sphinx extensions do because there is an
 issue with cropping the image if postscript specials are used.)
@@ -46,15 +50,20 @@ In the Sphinx project configuration file ``conf.py`` you need to:
 
 The following configuration values are supported:
 
-* To enable/disable transparent graphics (enabled by default)::
+* Choose the image processing ``‹suite›``, either ``'Netpbm'`` or
+  ``'ImageMagick'`` (``'Netpbm'`` by default)::
+
+    tikz_proc_suite = ‹suite›
+
+* Enable/disable transparent graphics (enabled by default)::
 
     tikz_transparent = ‹True or False›
 
-* To add ``‹string›`` to the latex preamble::
+* Add ``‹string›`` to the latex preamble::
 
     tikz_latex_preamble = ‹string›
 
-* To add ``\usetikzlibrary{‹string›}`` to the latex preamble::
+* Add ``\usetikzlibrary{‹string›}`` to the latex preamble::
 
     tikz_tikzlibraries = ‹string›
 

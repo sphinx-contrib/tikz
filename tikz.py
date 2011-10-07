@@ -87,13 +87,21 @@ class TikzDirective(Directive):
     required_arguments = 0
     optional_arguments = 1
     final_argument_whitespace = True
-    option_spec = {'libs':directives.unchanged}
+    option_spec = {'libs':directives.unchanged,'stringsubst':directives.flag}
 
     def run(self):
         node = tikz()
-        node['tikz'] = '\n'.join(self.content)
-        node['caption'] = '\n'.join(self.arguments)
+        if not self.content:
+            node['caption'] = ''
+            node['tikz'] = '\n'.join(self.arguments)
+        else:
+            node['tikz'] = '\n'.join(self.content)
+            node['caption'] = '\n'.join(self.arguments)
         node['libs'] = self.options.get('libs', '')
+        if 'stringsubst' in self.options:
+            node['stringsubst'] = True
+        else:
+            node['stringsubst'] = False
         return [node]
 
 DOC_HEAD = r'''
@@ -117,7 +125,7 @@ DOC_BODY = r'''
 \end{document}
 '''
 
-def render_tikz(self,tikz,libs=''):
+def render_tikz(self,tikz,libs='',stringsubst=False):
     hashkey = tikz.encode('utf-8')
     fname = 'tikz-%s.png' % (sha(hashkey).hexdigest())
     relfn = posixpath.join(self.builder.imgpath, fname)
@@ -134,8 +142,9 @@ def render_tikz(self,tikz,libs=''):
 
     latex = DOC_HEAD % libs
     latex += self.builder.config.tikz_latex_preamble
-    tikzz = tikz % {'wd': curdir}
-    latex += DOC_BODY % tikzz
+    if stringsubst:
+        tikz = tikz % {'wd': curdir}
+    latex += DOC_BODY % tikz
     if isinstance(latex, unicode):
         latex = latex.encode('utf-8')
 
@@ -290,25 +299,11 @@ def html_visit_tikzinline(self,node):
         raise nodes.SkipNode
 
 def html_visit_tikz(self,node):
-    # print "\n***********************************"
-    # print "You have entered the following argument"
-    # print "***********************************"
-    # print node['caption']
-    # print "***********************************"
-    # print "You have entered the following tikzlibraries"
-    # print "***********************************"
-    # print node['libs']
-    # print "\n***********************************"
-    # print "You have entered the following tikz-code"
-    # print "***********************************"
-    # print node['tikz']
-    # print "***********************************"
-
     libs = self.builder.config.tikz_tikzlibraries + ',' + node['libs']
     libs = libs.replace(' ', '').replace('\t', '').strip(', ')
 
     try:
-        fname = render_tikz(self,node['tikz'],libs)
+        fname = render_tikz(self,node['tikz'],libs,node['stringsubst'])
     except TikzExtError, exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
@@ -326,7 +321,7 @@ def html_visit_tikz(self,node):
         self.body.append('<img src="%s" alt="%s" /></p>\n' %
                          (fname, self.encode(node['tikz']).strip()))
         if node['caption']:
-            self.body.append('<p class="caption">%s</p>' % \
+            self.body.append('<p class="caption">%s</p>' %
                              self.encode(node['caption']).strip())
         self.body.append('</div>')
         raise nodes.SkipNode
