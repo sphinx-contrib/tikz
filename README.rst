@@ -6,9 +6,9 @@ This extension to `Sphinx <http://sphinx.pocoo.org/>`__ enables the use of the
 PGF/TikZ LaTeX package to draw nice pictures.  (See `CTAN
 <http://www.ctan.org/tex-archive/graphics/pgf/>`__ or `sourceforge
 <http://sourceforge.net/projects/pgf/>`__; the manual is, e.g., `here
-<http://www.ctan.org/tex-archive/graphics/pgf/base/doc/generic/pgf/pgfmanual.pdf>`__.)
-Have also a look at contributions such as `pgfplots
-<http://www.ctan.org/tex-archive/graphics/pgf/contrib/pgfplots/>`__.
+<http://www.ctan.org/tex-archive/graphics/pgf/base/doc/generic/pgf/pgfmanual.pdf>`__.
+Also have a look at contributions such as `pgfplots
+<http://www.ctan.org/tex-archive/graphics/pgf/contrib/pgfplots/>`__.)
 
 Use the extension at your own risk.  Anything might change in future versions
 without further notice.
@@ -32,8 +32,8 @@ On your computer the following must be installed:
   - ``pnmcrop`` and ``pnmtopng`` (both part of the Netpbm package)
   - ``convert`` (part of the ImageMagick package)
 
-(We cannot use ``dvipng`` as the math Sphinx extensions do because there is an
-issue with cropping the image if postscript specials are used.)
+(We cannot use ``dvipng`` as the ``pngmath`` Sphinx extension does because there
+is an issue with cropping the image if postscript specials are used.)
 
 The ``tikz`` Sphinx extension consists of the single file ``tikz.py`` (along
 with this description).
@@ -67,8 +67,8 @@ The following configuration values are supported:
 
     tikz_tikzlibraries = ‹string›
 
-  You might want to add the ``tikzlibraries`` in the ``latex_preamble``
-  e.g. as::
+  You might want to load the ``tikz`` package and add the ``tikzlibraries`` in
+  the ``latex_preamble``, e.g. as::
 
     latex_preamble = '''
     ‹...›
@@ -77,32 +77,46 @@ The following configuration values are supported:
     ‹...›
     '''
 
+.. highlight:: rest
+
 Usage
 =====
 
-The extension adds a ``tikz``-directive and a ``tikz``-role.  
+The extension adds a ``tikz``-directive and a ``tikz``-role.  The usage is very
+similar to the standard math Sphinx extensions.
 
-The **tikz-directive** is used as follows::
+The **tikz-directive** can be used in two ways::
 
-  .. tikz:: ‹caption potentially broken
+  .. tikz:: ‹tikz code, potentially broken
      across lines›
      :libs: ‹tikz libraries›
+     :stringsubst:
 
-     ‹tikz code›
+or::
 
-The caption is optional, but if present it is printed as a picture caption
-centered below the picture.
+  .. tikz:: ‹caption, potentially broken
+     across lines›
+     :libs: ‹tikz libraries›
+     :stringsubst:
 
-The ``‹tikz libraries›`` option is a comma separated list of tikz libraries to
-use.  If you want to build latex code then make sure that you add these to
-``latex_preamble`` in ``conf.py``.
+     ‹tikz code, potentially broken
+     across lines›
+
+The ``‹caption›`` is optional, but if present it is printed as a picture caption
+below the picture.
+
+The ``:libs:`` option expects its argument ``‹tikz libraries›`` to be a comma
+separated list of tikz libraries to use.  If you want to build the latex target
+then make sure that you add these libraries to ``latex_preamble`` in
+``conf.py``.
+
+The ``stringsubst`` option enables the following string substitution in the
+``‹tikz code›``.  Before processing the ``‹tikz code›`` the string ``%(wd)s`` is
+replaced by the project root directory.  This is convenient when referring to
+some source file in the LaTeX code.
 
 The ``‹tikz code›`` is code according to the tikz latex package.  It behaves as
-if inside a ``tikzpicture`` environment with one enhancement: The string
-``%(wd)s`` will be replaced by the project root directory.  This is convenient
-when referring to some source file in the LaTeX code.
-
-Note that there must be an empty line in front of ``‹tikz code›``.
+if inside a ``tikzpicture`` environment.
 
 The **tikz-role** is used as follows::
 
@@ -117,12 +131,23 @@ Examples
 
 ::
 
-  .. tikz:: An example directive
+  .. tikz:: [>=latex',dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
+     -- (2,0);
+     :libs: arrows
+
+
+.. tikz:: [>=latex',dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
+   -- (2,0);
+   :libs: arrows
+
+::
+
+  .. tikz:: An Example Directive with Caption
 
      \draw[thick,rounded corners=8pt]
      (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
 
-.. tikz:: An example directive
+.. tikz:: An Example Directive with Caption
 
    \draw[thick,rounded corners=8pt]
    (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
@@ -143,3 +168,6 @@ If you use the ``tikz`` directive inside of a table or a sidebar and you specify
 a caption then the latex target built by the sphinx builder will not compile.
 This is because, as soon as you specify a caption, the ``tikzpicture``
 environment is set inside a ``figure`` environment and hence it is a float.
+
+If you enable ``:stringsubst:`` then the character ``%`` cannot be used anymore
+for commenting LaTeX code.
