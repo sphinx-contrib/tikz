@@ -23,6 +23,9 @@ without further notice.
 Prerequisites and Configuration
 ===============================
 
+Prerequisites
+-------------
+
 On your computer the following must be installed:
 
 * ``latex`` with the ``tikz`` and the ``amsmath`` packages
@@ -34,6 +37,25 @@ On your computer the following must be installed:
 
 (We cannot use ``dvipng`` as the ``pngmath`` Sphinx extension does because there
 is an issue with cropping the image if postscript specials are used.)
+
+For **Ubuntu Linux** you roughly have to have the following packages installed:
+
+* ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
+* ``poppler-utils``
+* ``netpbm`` or ``imagemagick``
+
+For **Mac OS X** a possible way of getting this extension working is:
+
+* Install `homebrew <http://mxcl.github.com/homebrew/>`__ in the terminal by::
+
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/gist/323731)"
+
+* Install ``poppler`` (``pdftoppm`` comes with it), by::
+    
+    brew install poppler
+
+Configuration
+-------------
 
 The ``tikz`` Sphinx extension consists of the single file ``tikz.py`` (along
 with this description).
