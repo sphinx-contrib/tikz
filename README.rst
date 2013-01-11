@@ -3,7 +3,7 @@
 ==============================================
 
 This extension to `Sphinx <http://sphinx.pocoo.org/>`__ enables the use of the
-PGF/TikZ LaTeX package to draw nice pictures.  (See `CTAN
+PGF/Ti\ *k*\ Z LaTeX package to draw nice pictures.  (See `CTAN
 <http://www.ctan.org/tex-archive/graphics/pgf/>`__ or `sourceforge
 <http://sourceforge.net/projects/pgf/>`__; the manual is, e.g., `here
 <http://www.ctan.org/tex-archive/graphics/pgf/base/doc/generic/pgf/pgfmanual.pdf>`__.
@@ -99,6 +99,15 @@ The following configuration values are supported:
     ‹...›
     '''
 
+If you want to make use of the Ti\ *k*\ Z externalization library for the LaTeX
+build output, then you may want to change the line::
+
+  LATEXOPTS =
+
+in ``/usr/share/sphinx/texinputs/Makefile`` to::
+
+  LATEXOPTS = "-shell-escape"
+
 .. highlight:: rest
 
 Usage
@@ -145,8 +154,8 @@ The **tikz-role** is used as follows::
   :tikz:`‹tikz code›`
 
 The ``‹tikz code›`` is code according to the tikz latex package.  It behaves as
-if inside a ``\tikz`` macro.  TikZ options can be given at the start of the
-``‹tikz code›``.
+if inside a ``\tikz`` macro.  Ti\ *k*\ Z options can be given at the start of
+the ``‹tikz code›``.
 
 Examples
 ========
