@@ -1,6 +1,6 @@
-==============================================
- Description of the ``tikz`` Sphinx Extension
-==============================================
+================================================
+ Description of the Ti\ *k*\ Z Sphinx Extension
+================================================
 
 This extension to `Sphinx <http://sphinx.pocoo.org/>`__ enables the use of the
 PGF/Ti\ *k*\ Z LaTeX package to draw nice pictures.  (See `CTAN
@@ -17,8 +17,9 @@ without further notice.
 
 :Version: 0.4
 :Author: Christoph Reller ``creller@ee.ethz.ch``
-:Download: `tikz.py <../_static/tikz.py>`__
 :License: `BSD License <http://opensource.org/licenses/bsd-license.html>`__
+:Download: `tikz.py <http://people.ee.ethz.ch/~creller/web/_static/tikz.py>`__
+:Git Repository: https://bitbucket.org/philexander/tikz
 
 Prerequisites and Configuration
 ===============================
@@ -57,7 +58,7 @@ For **Mac OS X** a possible way of getting this extension working is:
 Configuration
 -------------
 
-The ``tikz`` Sphinx extension consists of the single file ``tikz.py`` (along
+The Ti\ *k*\ z Sphinx extension consists of the single file ``tikz.py`` (along
 with this description).
 
 In the Sphinx project configuration file ``conf.py`` you need to:
@@ -159,6 +160,9 @@ the ``‹tikz code›``.
 
 Examples
 ========
+
+.. note:: These examples only render in a Sphinx project with a proper
+	  configuration of the Ti\ *k*\ z Sphinx extension.
 
 ::
 

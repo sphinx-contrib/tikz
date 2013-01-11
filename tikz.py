@@ -155,7 +155,7 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
 
     chdir(tempdir)
 
-    tf = open('tikz.tex', 'w')
+    tf = open('tikz.tex', 'wb')
     tf.write(latex)
     tf.close()
 
