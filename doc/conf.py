@@ -12,6 +12,9 @@
 # serve to show the default.
 
 import sys, os
+
+# Import some information from the setup.py script.
+sys.path.insert(0, os.path.abspath('..'))
 import setup as setupfile
 
 # If extensions (or modules to document with autodoc) are in another directory,

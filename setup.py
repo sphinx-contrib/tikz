@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
-import sys
-
 LONG_DESCRIPTION = \
 '''
 This package contains the tikz Sphinx extension, which enables the use
@@ -30,27 +27,32 @@ CLASSIFIERS  = [
     'Topic :: Utilities',
     ]
 
-# Use 2to3 for Python 3 without warnings in Python 2
-extra = {}
-if sys.version_info >= (3,):
-    extra['use_2to3'] = True
+if __name__ == "__main__":
+
+    from setuptools import setup, find_packages
+    import sys
+
+    # Use 2to3 for Python 3 without warnings in Python 2
+    extra = {}
+    if sys.version_info >= (3,):
+        extra['use_2to3'] = True
     
-setup(
-    name=NAME,
-    version=VERSION,
-    url=URL,
-    download_url=DOWNLOAD,
-    license=LICENSE,
-    author=AUTHOR,
-    author_email=AUTHOR_EMAIL,
-    description=DESCRIPTION,
-    long_description=LONG_DESCRIPTION,
-    zip_safe=False,
-    classifiers=CLASSIFIERS,
-    platforms='any',
-    packages=find_packages(),
-    include_package_data=True,
-    install_requires=REQUIRES,
-    namespace_packages=['sphinxcontrib'],
-    **extra
-)
+    setup(
+        name=NAME,
+        version=VERSION,
+        url=URL,
+        download_url=DOWNLOAD,
+        license=LICENSE,
+        author=AUTHOR,
+        author_email=AUTHOR_EMAIL,
+        description=DESCRIPTION,
+        long_description=LONG_DESCRIPTION,
+        zip_safe=False,
+        classifiers=CLASSIFIERS,
+        platforms='any',
+        packages=find_packages(),
+        include_package_data=True,
+        install_requires=REQUIRES,
+        namespace_packages=['sphinxcontrib'],
+        **extra
+        )

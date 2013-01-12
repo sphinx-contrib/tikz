@@ -6,10 +6,11 @@
 Welcome to TikZ Sphinx Extension's documentation!
 =================================================
 
-Contents:
-
 .. toctree::
    :maxdepth: 2
+
+
+.. include:: ../README.rst
 
 
 
