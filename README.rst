@@ -20,6 +20,7 @@ without further notice.
 :License: `BSD License <http://opensource.org/licenses/bsd-license.html>`__
 :Download: `tikz.py <http://people.ee.ethz.ch/~creller/web/_static/tikz.py>`__
 :Git Repository: https://bitbucket.org/philexander/tikz
+:PyPI Package: http://pypi.python.org/pypi/sphinxcontrib-tikz
 
 Prerequisites and Configuration
 ===============================
@@ -166,12 +167,12 @@ Examples
 
 ::
 
-  .. tikz:: [>=latex',dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
+  .. tikz:: [>=latex,dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
      -- (2,0);
      :libs: arrows
 
 
-.. tikz:: [>=latex',dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
+.. tikz:: [>=latex,dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
    -- (2,0);
    :libs: arrows
 
