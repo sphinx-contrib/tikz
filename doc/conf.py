@@ -44,8 +44,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'TikZ Sphinx Extension'
-copyright = u'2010-2013, Christoph Reller'
+project = 'TikZ Sphinx Extension'
+copyright = '2010-2013, Christoph Reller'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -181,14 +181,14 @@ latex_elements = {
 #'pointsize': '10pt',
 
 # Additional stuff for the LaTeX preamble.
-'preamble': '\usepackage{tikz}',
+'preamble': '\\usepackage{tikz}',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'TikZSphinxExtension.tex', u'TikZ Sphinx Extension Documentation',
-   u'Christoph Reller', 'manual'),
+  ('index', 'TikZSphinxExtension.tex', 'TikZ Sphinx Extension Documentation',
+   'Christoph Reller', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -217,8 +217,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'tikzsphinxextension', u'TikZ Sphinx Extension Documentation',
-     [u'Christoph Reller'], 1)
+    ('index', 'tikzsphinxextension', 'TikZ Sphinx Extension Documentation',
+     ['Christoph Reller'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -231,8 +231,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'TikZSphinxExtension', u'TikZ Sphinx Extension Documentation',
-   u'Christoph Reller', 'TikZSphinxExtension', 'One line description of project.',
+  ('index', 'TikZSphinxExtension', 'TikZ Sphinx Extension Documentation',
+   'Christoph Reller', 'TikZSphinxExtension', 'One line description of project.',
    'Miscellaneous'),
 ]
 
