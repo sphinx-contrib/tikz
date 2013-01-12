@@ -1,6 +1,9 @@
-================================================
- Description of the Ti\ *k*\ Z Sphinx Extension
-================================================
+==============================================
+Description of the Ti\ *k*\ Z Sphinx Extension
+==============================================
+
+Introduction
+============
 
 This extension to `Sphinx <http://sphinx.pocoo.org/>`__ enables the use of the
 PGF/Ti\ *k*\ Z LaTeX package to draw nice pictures.  (See `CTAN
