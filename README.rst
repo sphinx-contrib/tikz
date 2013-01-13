@@ -59,18 +59,11 @@ For **Mac OS X** a possible way of getting this extension working is:
 Configuration
 -------------
 
-The Ti\ *k*\ z Sphinx extension consists of the single file ``tikz.py`` (along
-with this description).
-
-In the Sphinx project configuration file ``conf.py`` you need to:
-
-- add the directory where ``tikz.py`` is located to ``sys.path``, e.g. by::
-
-    sys.path.append(os.path.expanduser('~/‹path to directory›'))
-
-- load the extension by::
-
-    extensions = ['tikz']
+If you have installed the Ti\ *k*\ z Sphinx extension e.g. using `PyPI
+http://pypi.python.org/pypi/sphinxcontrib-tikz`__, then you have to load the
+extension in the Sphinx project configuration file ``conf.py`` by::
+ 
+    extensions = ['sphinxcontrib.tikz']
 
 The following configuration values are supported:
 
@@ -83,11 +76,11 @@ The following configuration values are supported:
 
     tikz_transparent = ‹True or False›
 
-* Add ``‹string›`` to the latex preamble::
+* Add ``‹string›`` to the LaTeX preamble::
 
     tikz_latex_preamble = ‹string›
 
-* Add ``\usetikzlibrary{‹string›}`` to the latex preamble::
+* Add ``\usetikzlibrary{‹string›}`` to the LaTeX preamble::
 
     tikz_tikzlibraries = ‹string›
 
@@ -139,7 +132,7 @@ The ``‹caption›`` is optional, but if present it is printed as a picture cap
 below the picture.
 
 The ``:libs:`` option expects its argument ``‹tikz libraries›`` to be a comma
-separated list of tikz libraries to use.  If you want to build the latex target
+separated list of tikz libraries to use.  If you want to build the LaTeX target
 then make sure that you add these libraries to ``latex_preamble`` in
 ``conf.py``.
 
@@ -148,14 +141,14 @@ The ``stringsubst`` option enables the following string substitution in the
 replaced by the project root directory.  This is convenient when referring to
 some source file in the LaTeX code.
 
-The ``‹tikz code›`` is code according to the tikz latex package.  It behaves as
+The ``‹tikz code›`` is code according to the tikz LaTeX package.  It behaves as
 if inside a ``tikzpicture`` environment.
 
 The **tikz-role** is used as follows::
 
   :tikz:`‹tikz code›`
 
-The ``‹tikz code›`` is code according to the tikz latex package.  It behaves as
+The ``‹tikz code›`` is code according to the tikz LaTeX package.  It behaves as
 if inside a ``\tikz`` macro.  Ti\ *k*\ Z options can be given at the start of
 the ``‹tikz code›``.
 
@@ -167,12 +160,12 @@ Examples
 
 ::
 
-  .. tikz:: [>=latex,dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
+  .. tikz:: [>=latex',dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
      -- (2,0);
      :libs: arrows
 
 
-.. tikz:: [>=latex,dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
+.. tikz:: [>=latex',dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
    -- (2,0);
    :libs: arrows
 
@@ -201,7 +194,7 @@ Caveats
 =======
 
 If you use the ``tikz`` directive inside of a table or a sidebar and you specify
-a caption then the latex target built by the sphinx builder will not compile.
+a caption then the LaTeX target built by the sphinx builder will not compile.
 This is because, as soon as you specify a caption, the ``tikzpicture``
 environment is set inside a ``figure`` environment and hence it is a float.
 
