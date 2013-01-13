@@ -60,7 +60,7 @@ Configuration
 -------------
 
 If you have installed the Ti\ *k*\ z Sphinx extension e.g. using `PyPI
-http://pypi.python.org/pypi/sphinxcontrib-tikz`__, then you have to load the
+<http://pypi.python.org/pypi/sphinxcontrib-tikz>`__, then you have to load the
 extension in the Sphinx project configuration file ``conf.py`` by::
  
     extensions = ['sphinxcontrib.tikz']
