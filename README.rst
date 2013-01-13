@@ -16,7 +16,7 @@ without further notice.
 ----
 
 :Version: 0.4.1
-:Author: Christoph Reller ``creller@ee.ethz.ch``
+:Author: Christoph Reller ``christoph.reller@gmail.com``
 :License: `BSD License <http://opensource.org/licenses/bsd-license.html>`__
 :Download: `tikz.py <http://people.ee.ethz.ch/~creller/web/_static/tikz.py>`__
 :Git Repository: https://bitbucket.org/philexander/tikz
