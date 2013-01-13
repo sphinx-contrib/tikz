@@ -181,14 +181,17 @@ latex_elements = {
 #'pointsize': '10pt',
 
 # Additional stuff for the LaTeX preamble.
-'preamble': '\\usepackage{tikz}',
+'preamble': '''
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+''',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'TikZSphinxExtension.tex', 'TikZ Sphinx Extension Documentation',
-   'Christoph Reller', 'manual'),
+   'Christoph Reller', 'howto'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
