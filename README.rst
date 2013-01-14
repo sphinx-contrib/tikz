@@ -100,14 +100,15 @@ build target:
    
    * The ``tikz_latex_preamble``
    * The ``tikz_libraries``
-   * Any options ``‹libs›`` given to the ``tikz`` directive (see :ref:`usage`)
+   * Any ``‹tikz libraries›`` given to the ``libs`` option of the ``tikz``
+     directive (see :ref:`usage`)
 
    This can be done, e.g., as::
 
      latex_elements = {
      ‹...›
      'preamble': '''\usepackage{tikz}''' + '''
-     \usetikzlibrary{''' + tikz_tikzlibraries + ‹libs› + '''}'''
+     \usetikzlibrary{''' + tikz_tikzlibraries + ‹tikz libraries› + '''}'''
      ‹...›
      }
 
