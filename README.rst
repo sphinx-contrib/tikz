@@ -63,9 +63,19 @@ If you have installed the Ti\ *k*\ z Sphinx extension e.g. using `PyPI
 <http://pypi.python.org/pypi/sphinxcontrib-tikz>`__, then you have to load the
 extension in the Sphinx project configuration file ``conf.py`` by::
  
-    extensions = ['sphinxcontrib.tikz']
+  extensions = ['sphinxcontrib.tikz']
 
-The following configuration values are supported:
+Also in ``conf.py``, you have to specify the LaTeX preamble in the
+``latex_elements`` dictionary as::
+
+  latex_elements = {
+  ‹...›
+  'preamble': '\\usepackage{tikz}',
+  ‹...›
+  }
+
+Additionally, the following configuration values are supported for the ``html``
+build target:
 
 * Choose the image processing ``‹suite›``, either ``'Netpbm'`` or
   ``'ImageMagick'`` (``'Netpbm'`` by default)::
@@ -84,26 +94,36 @@ The following configuration values are supported:
 
     tikz_tikzlibraries = ‹string›
 
-  You might want to load the ``tikz`` package and add the ``tikzlibraries`` in
-  the ``latex_preamble``, e.g. as::
+.. note:: The above configuration values only apply to the ``html`` build
+   target.  If you want to use the ``latex`` target, then you have to take care
+   to include in the preamble for the ``latex`` target:
+   
+   * The ``tikz_latex_preamble``
+   * The ``tikz_libraries``
+   * Any ``‹tikz libraries›`` given to the ``libs`` option of the ``tikz``
+     directive (see :ref:`usage`)
 
-    latex_preamble = '''
-    ‹...›
-    \usepackage{tikz}
-    \usetikzlibrary{''' + tikz_tikzlibraries + '''}
-    ‹...›
-    '''
+   This can be done, e.g., as::
 
-If you want to make use of the Ti\ *k*\ Z externalization library for the LaTeX
-build output, then you may want to change the line::
+     latex_elements = {
+     ‹...›
+     'preamble': '''\usepackage{tikz}''' + '''
+     \usetikzlibrary{''' + tikz_tikzlibraries + ‹tikz libraries› + '''}'''
+     ‹...›
+     }
 
-  LATEXOPTS =
+.. note:: If you want to make use of the Ti\ *k*\ Z externalization library for
+   the LaTeX build output, then you may want to change the line::
 
-in ``/usr/share/sphinx/texinputs/Makefile`` to::
+     LATEXOPTS =
+     
+   in ``/usr/share/sphinx/texinputs/Makefile`` to::
 
-  LATEXOPTS = "-shell-escape"
+     LATEXOPTS = "-shell-escape"
 
 .. highlight:: rest
+
+.. _usage:
 
 Usage
 =====

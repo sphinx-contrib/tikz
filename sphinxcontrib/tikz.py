@@ -99,11 +99,6 @@ class TikzDirective(Directive):
 DOC_HEAD = r'''
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{amssymb}
-\usepackage{amsfonts}
-\usepackage{bm}
 \usepackage{tikz}
 \usetikzlibrary{%s}
 \pagestyle{empty}
