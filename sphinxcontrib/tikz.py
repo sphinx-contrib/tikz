@@ -172,7 +172,7 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
     # stdout, stderr = p1.communicate()
 
     try:
-        p = Popen(['pdftoppm', '-r', '120', 'tikz.pdf', 'tikz'],
+        p = Popen(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf', 'tikz'],
                   stdout=PIPE, stderr=PIPE)
     except OSError, e:
         if e.errno != ENOENT:   # No such file or directory
@@ -195,7 +195,7 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
 
         try:
             p1 = Popen(['convert', '-trim'] + convert_args +
-                       ['tikz-1.ppm', outfn],
+                       ['tikz.ppm', outfn],
                        stdout=PIPE, stderr=PIPE)
         except OSError, e:
             if e.errno != ENOENT:   # No such file or directory
@@ -215,7 +215,7 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
 
     elif self.builder.config.tikz_proc_suite == 'Netpbm':
         try:
-            p1 = Popen(['pnmcrop', 'tikz-1.ppm'], stdout=PIPE, stderr=PIPE)
+            p1 = Popen(['pnmcrop', 'tikz.ppm'], stdout=PIPE, stderr=PIPE)
         except OSError, err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
@@ -331,6 +331,8 @@ def latex_visit_tikzinline(self, node):
 
 def latex_visit_tikz(self, node):
     if node['caption']:
+        if node['stringsubst']:
+            node['tikz'] = node['tikz'] % {'wd': getcwd()}
         latex = '\\begin{figure}[htp]\\centering\\begin{tikzpicture}' + \
                 node['tikz'] + '\\end{tikzpicture}' + '\\caption{' + \
                 self.encode(node['caption']).strip() + '}\\end{figure}'
