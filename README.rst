@@ -56,6 +56,41 @@ For **Mac OS X** a possible way of getting this extension working is:
     
     brew install poppler
 
+For **Windows** you will need to install this two packages:
+
+* `Xpdf package <http://www.foolabs.com/xpdf/download.html>`__
+* `NetPbm for Windows package <http://gnuwin32.sourceforge.net/packages/netpbm.htm>`__
+  
+  If you don't want to install these packages, you can use only the files nedded.
+  
+    From Xpdf
+
+    * ``pdftoppm`` 
+  
+    From NetPbm
+  
+    * ``pnmcrop.exe`` 
+    * ``pnmtopng.exe``
+    * ``libnetpbm10.dll``
+    * ``libpng13.dll``
+    * ``rgb.txt``
+
+    Put these files in one folder and add the folder to the system path. 
+
+    Also, you need to create a new system variable *RGBDEF=C:\\TikzSphinx\\rgb.txt* assuming you copy the files to the C:\\TikzSphinx folder.
+
+  Additional note to windows install: If using an earlier version of the extension, you may need to modify the tikz.py file. Line
+
+    .. code-block:: python
+
+      p1 = Popen(['pnmcrop', 'tikz-1.ppm'], stdout=PIPE, stderr=PIPE)
+
+    To:
+
+    .. code-block:: python
+
+      p1 = Popen(['pnmcrop', 'tikz-000001.ppm'], stdout=PIPE, stderr=PIPE) 
+
 Configuration
 -------------
 

@@ -61,6 +61,8 @@ except:
     
 from sphinx.util.compat import Directive
 
+_Win_ = sys.platform[0:3] == 'win'
+
 class TikzExtError(SphinxError):
     category = 'Tikz extension error'
 
@@ -172,7 +174,11 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
     # stdout, stderr = p1.communicate()
 
     try:
-        p = Popen(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf', 'tikz'],
+        if _Win_:
+            p = Popen(['pdftoppm', '-r', '120', 'tikz.pdf', 'tikz'], 
+                  stdout=PIPE, stderr=PIPE)
+        else:
+            p = Popen(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf', 'tikz'],
                   stdout=PIPE, stderr=PIPE)
     except OSError, e:
         if e.errno != ENOENT:   # No such file or directory
@@ -215,7 +221,10 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
 
     elif self.builder.config.tikz_proc_suite == 'Netpbm':
         try:
-            p1 = Popen(['pnmcrop', 'tikz.ppm'], stdout=PIPE, stderr=PIPE)
+            if _Win_:
+                p1 = Popen(['pnmcrop', 'tikz-000001.ppm'], stdout=PIPE, stderr=PIPE)
+            else:
+                p1 = Popen(['pnmcrop', 'tikz.ppm'], stdout=PIPE, stderr=PIPE)
         except OSError, err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
