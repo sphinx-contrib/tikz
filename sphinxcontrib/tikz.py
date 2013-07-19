@@ -64,7 +64,6 @@ except:
 from sphinx.util.compat import Directive
 
 _Win_ = sys.platform[0:3] == 'win'
-fromFile = False
 
 class TikzExtError(SphinxError):
     category = 'Tikz extension error'
@@ -97,10 +96,9 @@ class TikzDirective(Directive):
             try:
                 fp = codecs.open(filename, 'r', 'utf-8')
                 try:
-                    node['tikz'] = fp.read()
+                    node['tikz'] = '\n' + fp.read() + '\n'
                 finally:
                     fp.close()
-                    fromFile = True
             except (IOError, OSError):
                 return [self.state.document.reporter.warning(
                     'External Tikz file %r not found or reading '
@@ -139,13 +137,12 @@ DOC_HEAD = r'''
 
 DOC_BODY = r'''
 \begin{document}
-\begin{tikzpicture}
 %s
-\end{tikzpicture}
 \end{document}
 '''
 
-def render_tikz(self,tikz,libs='',stringsubst=False):
+def render_tikz(self,node,libs='',stringsubst=False):
+    tikz = node['tikz']
     hashkey = tikz.encode('utf-8')
     fname = 'tikz-%s.png' % (sha(hashkey).hexdigest())
     relfn = posixpath.join(self.builder.imgpath, fname)
@@ -164,6 +161,8 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
     latex += self.builder.config.tikz_latex_preamble
     if stringsubst:
         tikz = tikz % {'wd': curdir}
+    if node['include'] == '':
+        tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
     latex += DOC_BODY % tikz
     if isinstance(latex, unicode):
         latex = latex.encode('utf-8')
@@ -308,7 +307,7 @@ def html_visit_tikzinline(self,node):
     libs = self.builder.config.tikz_tikzlibraries
     libs = libs.replace(' ', '').replace('\t', '').strip(', ')
     try:
-        fname = render_tikz(self,node['tikz'],libs);
+        fname = render_tikz(self,node,libs);
     except TikzExtError, exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
@@ -330,7 +329,7 @@ def html_visit_tikz(self,node):
     libs = libs.replace(' ', '').replace('\t', '').strip(', ')
 
     try:
-        fname = render_tikz(self,node['tikz'],libs,node['stringsubst'])
+        fname = render_tikz(self,node,libs,node['stringsubst'])
     except TikzExtError, exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
@@ -370,9 +369,10 @@ def latex_visit_tikzinline(self, node):
     raise nodes.SkipNode
 
 def latex_visit_tikz(self, node):
-    if fromFile:
+    if node['include'] != '':
         begTikzPic = ''
         endTikzPic = ''
+        node['tikz']=node['tikz'].replace('\r\n','\n')
     else:
         begTikzPic = '\\begin{tikzpicture}'
         endTikzPic = '\\end{tikzpicture}'
