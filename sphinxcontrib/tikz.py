@@ -43,6 +43,8 @@ import tempfile
 import posixpath
 import shutil
 import sys
+import codecs
+
 from os import path, getcwd, chdir, mkdir, system
 from subprocess import Popen, PIPE, call
 try:
@@ -62,6 +64,7 @@ except:
 from sphinx.util.compat import Directive
 
 _Win_ = sys.platform[0:3] == 'win'
+fromFile = False
 
 class TikzExtError(SphinxError):
     category = 'Tikz extension error'
@@ -81,27 +84,55 @@ class TikzDirective(Directive):
     required_arguments = 0
     optional_arguments = 1
     final_argument_whitespace = True
-    option_spec = {'libs':directives.unchanged,'stringsubst':directives.flag}
+    option_spec = {'libs':directives.unchanged,'stringsubst':directives.flag, 'include':directives.unchanged}
 
     def run(self):
         node = tikz()
-        if not self.content:
+
+        node['include']=self.options.get('include', '')
+        if node['include'] != '':
+            env = self.state.document.settings.env
+            rel_filename, filename = env.relfn2path(node['include'])
+            env.note_dependency(rel_filename)
+            try:
+                fp = codecs.open(filename, 'r', 'utf-8')
+                try:
+                    node['tikz'] = fp.read()
+                finally:
+                    fp.close()
+                    fromFile = True
+            except (IOError, OSError):
+                return [self.state.document.reporter.warning(
+                    'External Tikz file %r not found or reading '
+                    'it failed' % filename, line=self.lineno)]
             node['caption'] = ''
-            node['tikz'] = '\n'.join(self.arguments)
+            if self.arguments:
+                node['caption'] = '\n'.join(self.arguments)
         else:
-            node['tikz'] = '\n'.join(self.content)
-            node['caption'] = '\n'.join(self.arguments)
+            if not self.content:
+                node['caption'] = ''
+                node['tikz'] = '\n'.join(self.arguments)
+            else:
+                node['tikz'] = '\n'.join(self.content)
+                node['caption'] = '\n'.join(self.arguments)
+        
         node['libs'] = self.options.get('libs', '')
         if 'stringsubst' in self.options:
             node['stringsubst'] = True
         else:
             node['stringsubst'] = False
+        if node['tikz'] == '':
+            return [self.state_machine.reporter.warning(
+                    'Ignoring "tikz" directive without content.',
+                    line=self.lineno)]
         return [node]
 
 DOC_HEAD = r'''
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
+\usepackage{amsmath}
 \usepackage{tikz}
+\usepackage{pgfplots}
 \usetikzlibrary{%s}
 \pagestyle{empty}
 '''
@@ -339,15 +370,22 @@ def latex_visit_tikzinline(self, node):
     raise nodes.SkipNode
 
 def latex_visit_tikz(self, node):
+    if fromFile:
+        begTikzPic = ''
+        endTikzPic = ''
+    else:
+        begTikzPic = '\\begin{tikzpicture}'
+        endTikzPic = '\\end{tikzpicture}'
+
     if node['caption']:
         if node['stringsubst']:
             node['tikz'] = node['tikz'] % {'wd': getcwd()}
-        latex = '\\begin{figure}[htp]\\centering\\begin{tikzpicture}' + \
-                node['tikz'] + '\\end{tikzpicture}' + '\\caption{' + \
+        latex = '\\begin{figure}[htp]\\centering' + begTikzPic + \
+                node['tikz'] + endTikzPic + '\\caption{' + \
                 self.encode(node['caption']).strip() + '}\\end{figure}'
     else:
-        latex = '\\begin{center}\\begin{tikzpicture}' + node['tikz'] + \
-            '\\end{tikzpicture}\\end{center}'
+        latex = '\\begin{center}' + begTikzPic + node['tikz'] + \
+            endTikzPic + '\\end{center}'
     self.body.append(latex)
 
 def depart_tikz(self,node):

@@ -101,11 +101,15 @@ extension in the Sphinx project configuration file ``conf.py`` by::
   extensions = ['sphinxcontrib.tikz']
 
 Also in ``conf.py``, you have to specify the LaTeX preamble in the
-``latex_elements`` dictionary as::
+``latex_elements`` dictionary, adding the tikz package and any other package or library used by the tikz pictures as::
 
   latex_elements = {
   ‹...›
-  'preamble': '\\usepackage{tikz}',
+  'preamble': '''
+  \usepackage{tikz}
+  \usepackage{pgfplots}
+  \usetikzlibrary{arrows}
+  ''',
   ‹...›
   }
 
@@ -207,6 +211,13 @@ The ``‹tikz code›`` is code according to the tikz LaTeX package.  It behaves
 if inside a ``\tikz`` macro.  Ti\ *k*\ Z options can be given at the start of
 the ``‹tikz code›``.
 
+Additionaly, the ``:include:`` option can be used to import an entire tikzpicture
+
+  .. tikz::‹caption, potentially broken
+     across lines›
+     :libs: ‹tikz libraries›
+     :include: <filename>
+
 Examples
 ========
 
@@ -244,6 +255,12 @@ Examples
 
 An example role :tikz:`[thick] \node[draw] (a) {A}; \node[draw,dotted,right
 of=a] {B} edge[<-] (a);`
+
+Example of a plot imported from a file:
+
+.. tikz:: 
+  :libs: arrows
+  :include: NewGM-Armijo2.tikz
 
 Caveats
 =======

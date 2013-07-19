@@ -182,7 +182,9 @@ latex_elements = {
 
 # Additional stuff for the LaTeX preamble.
 'preamble': '''
+\usepackage{amsmath}
 \usepackage{tikz}
+\usepackage{pgfplots}
 \usetikzlibrary{arrows}
 ''',
 }
