@@ -211,7 +211,7 @@ The ``‹tikz code›`` is code according to the tikz LaTeX package.  It behaves
 if inside a ``\tikz`` macro.  Ti\ *k*\ Z options can be given at the start of
 the ``‹tikz code›``.
 
-Additionaly, the ``:include:`` option can be used to import an entire tikzpicture
+Additionaly, the ``:include:`` option can be used to import an entire tikzpicture::
 
   .. tikz::‹caption, potentially broken
      across lines›
