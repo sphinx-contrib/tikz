@@ -133,7 +133,7 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
     if stringsubst:
         tikz = Template(tikz).substitute(wd=curdir.replace('\\','/'))
     latex += DOC_BODY % tikz
-    if isinstance(latex, unicode):
+    if isinstance(latex, str):
         latex = latex.encode('utf-8')
 
     if not hasattr(self.builder, '_tikz_tempdir'):
@@ -151,7 +151,7 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
         try:
             p = Popen(['pdflatex', '--interaction=nonstopmode', 'tikz.tex'],
                       stdout=PIPE, stderr=PIPE)
-        except OSError, err:
+        except OSError as err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
             self.builder.warn('LaTeX command cannot be run')
@@ -175,7 +175,7 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
     try:
         p = Popen(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf', 'tikz'],
                   stdout=PIPE, stderr=PIPE)
-    except OSError, e:
+    except OSError as e:
         if e.errno != ENOENT:   # No such file or directory
             raise
         self.builder.warn('pdftoppm command cannot be run')
@@ -198,7 +198,7 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
             p1 = Popen(['convert', '-trim'] + convert_args +
                        ['tikz.ppm', outfn],
                        stdout=PIPE, stderr=PIPE)
-        except OSError, e:
+        except OSError as e:
             if e.errno != ENOENT:   # No such file or directory
                 raise
             self.builder.warn('convert command cannot be run')
@@ -217,7 +217,7 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
     elif self.builder.config.tikz_proc_suite == 'Netpbm':
         try:
             p1 = Popen(['pnmcrop', 'tikz.ppm'], stdout=PIPE, stderr=PIPE)
-        except OSError, err:
+        except OSError as err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
             self.builder.warn('pnmcrop command cannot be run:')
@@ -233,7 +233,7 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
         try:
             p2 = Popen(['pnmtopng'] + pnm_args, stdin=p1.stdout,
                        stdout=PIPE, stderr=PIPE)
-        except OSError, err:
+        except OSError as err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
             self.builder.warn('pnmtopng command cannot be run:')
@@ -270,7 +270,7 @@ def html_visit_tikzinline(self,node):
     libs = libs.replace(' ', '').replace('\t', '').strip(', ')
     try:
         fname = render_tikz(self,node['tikz'],libs);
-    except TikzExtError, exc:
+    except TikzExtError as exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
                                   backrefs=[], source=node['tikz'])
@@ -292,7 +292,7 @@ def html_visit_tikz(self,node):
 
     try:
         fname = render_tikz(self,node['tikz'],libs,node['stringsubst'])
-    except TikzExtError, exc:
+    except TikzExtError as exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
                                   backrefs=[], source=node['tikz'])
