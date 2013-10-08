@@ -160,7 +160,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
     latex = DOC_HEAD % libs
     latex += self.builder.config.tikz_latex_preamble
     if stringsubst:
-        tikz = tikz % {'wd': curdir}
+        tikz = Template(tikz).substitute(wd=curdir.replace('\\','/'))
     if node['include'] == '':
         tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
     latex += DOC_BODY % tikz
