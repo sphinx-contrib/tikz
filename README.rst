@@ -196,9 +196,9 @@ then make sure that you add these libraries to ``latex_preamble`` in
 ``conf.py``.
 
 The ``stringsubst`` option enables the following string substitution in the
-``‹tikz code›``.  Before processing the ``‹tikz code›`` the string ``%(wd)s`` is
-replaced by the project root directory.  This is convenient when referring to
-some source file in the LaTeX code.
+``‹tikz code›``.  Before processing the ``‹tikz code›`` the string ``$wd`` or
+``${wd}`` is replaced by the project root directory.  This is convenient when
+referring to some source file in the LaTeX code.
 
 The ``‹tikz code›`` is code according to the tikz LaTeX package.  It behaves as
 if inside a ``tikzpicture`` environment.
@@ -268,7 +268,9 @@ Caveats
 If you use the ``tikz`` directive inside of a table or a sidebar and you specify
 a caption then the LaTeX target built by the sphinx builder will not compile.
 This is because, as soon as you specify a caption, the ``tikzpicture``
-environment is set inside a ``figure`` environment and hence it is a float.
+environment is set inside a ``figure`` environment and hence it is a float and
+cannot live inside a table or another float.
 
-If you enable ``:stringsubst:`` then the character ``%`` cannot be used anymore
-for commenting LaTeX code.
+If you enable ``:stringsubst:`` and you happen to have a math expression
+starting with ``wd`` (i.e., you would like to write ``$wd ...`` then you must
+insert some white space, e.g., ``$w d ...`` to prevent string substitution.

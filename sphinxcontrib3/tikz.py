@@ -43,8 +43,6 @@ import tempfile
 import posixpath
 import shutil
 import sys
-import codecs
-
 from os import path, getcwd, chdir, mkdir, system
 from string import Template
 from subprocess import Popen, PIPE, call
@@ -64,8 +62,6 @@ except:
 
 from sphinx.util.compat import Directive
 
-_Win_ = sys.platform[0:3] == 'win'
-
 class TikzExtError(SphinxError):
     category = 'Tikz extension error'
 
@@ -84,66 +80,40 @@ class TikzDirective(Directive):
     required_arguments = 0
     optional_arguments = 1
     final_argument_whitespace = True
-    option_spec = {'libs':directives.unchanged,'stringsubst':directives.flag, 'include':directives.unchanged}
+    option_spec = {'libs':directives.unchanged,'stringsubst':directives.flag}
 
     def run(self):
         node = tikz()
-
-        node['include']=self.options.get('include', '')
-        if node['include'] != '':
-            env = self.state.document.settings.env
-            rel_filename, filename = env.relfn2path(node['include'])
-            env.note_dependency(rel_filename)
-            try:
-                fp = codecs.open(filename, 'r', 'utf-8')
-                try:
-                    node['tikz'] = '\n' + fp.read() + '\n'
-                finally:
-                    fp.close()
-            except (IOError, OSError):
-                return [self.state.document.reporter.warning(
-                    'External Tikz file %r not found or reading '
-                    'it failed' % filename, line=self.lineno)]
+        if not self.content:
             node['caption'] = ''
-            if self.arguments:
-                node['caption'] = '\n'.join(self.arguments)
+            node['tikz'] = '\n'.join(self.arguments)
         else:
-            if not self.content:
-                node['caption'] = ''
-                node['tikz'] = '\n'.join(self.arguments)
-            else:
-                node['tikz'] = '\n'.join(self.content)
-                node['caption'] = '\n'.join(self.arguments)
-        
+            node['tikz'] = '\n'.join(self.content)
+            node['caption'] = '\n'.join(self.arguments)
         node['libs'] = self.options.get('libs', '')
         if 'stringsubst' in self.options:
             node['stringsubst'] = True
         else:
             node['stringsubst'] = False
-        if node['tikz'] == '':
-            return [self.state_machine.reporter.warning(
-                    'Ignoring "tikz" directive without content.',
-                    line=self.lineno)]
         return [node]
 
 DOC_HEAD = r'''
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath}
 \usepackage{tikz}
-\usepackage{pgfplots}
 \usetikzlibrary{%s}
 \pagestyle{empty}
 '''
 
 DOC_BODY = r'''
 \begin{document}
+\begin{tikzpicture}
 %s
+\end{tikzpicture}
 \end{document}
 '''
 
-def render_tikz(self,node,libs='',stringsubst=False):
-    tikz = node['tikz']
+def render_tikz(self,tikz,libs='',stringsubst=False):
     hashkey = tikz.encode('utf-8')
     fname = 'tikz-%s.png' % (sha(hashkey).hexdigest())
     relfn = posixpath.join(self.builder.imgpath, fname)
@@ -162,10 +132,8 @@ def render_tikz(self,node,libs='',stringsubst=False):
     latex += self.builder.config.tikz_latex_preamble
     if stringsubst:
         tikz = Template(tikz).substitute(wd=curdir.replace('\\','/'))
-    if node['include'] == '':
-        tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
     latex += DOC_BODY % tikz
-    if isinstance(latex, unicode):
+    if isinstance(latex, str):
         latex = latex.encode('utf-8')
 
     if not hasattr(self.builder, '_tikz_tempdir'):
@@ -183,7 +151,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
         try:
             p = Popen(['pdflatex', '--interaction=nonstopmode', 'tikz.tex'],
                       stdout=PIPE, stderr=PIPE)
-        except OSError, err:
+        except OSError as err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
             self.builder.warn('LaTeX command cannot be run')
@@ -205,13 +173,9 @@ def render_tikz(self,node,libs='',stringsubst=False):
     # stdout, stderr = p1.communicate()
 
     try:
-        if _Win_:
-            p = Popen(['pdftoppm', '-r', '120', 'tikz.pdf', 'tikz'], 
+        p = Popen(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf', 'tikz'],
                   stdout=PIPE, stderr=PIPE)
-        else:
-            p = Popen(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf', 'tikz'],
-                  stdout=PIPE, stderr=PIPE)
-    except OSError, e:
+    except OSError as e:
         if e.errno != ENOENT:   # No such file or directory
             raise
         self.builder.warn('pdftoppm command cannot be run')
@@ -234,7 +198,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
             p1 = Popen(['convert', '-trim'] + convert_args +
                        ['tikz.ppm', outfn],
                        stdout=PIPE, stderr=PIPE)
-        except OSError, e:
+        except OSError as e:
             if e.errno != ENOENT:   # No such file or directory
                 raise
             self.builder.warn('convert command cannot be run')
@@ -252,11 +216,8 @@ def render_tikz(self,node,libs='',stringsubst=False):
 
     elif self.builder.config.tikz_proc_suite == 'Netpbm':
         try:
-            if _Win_:
-                p1 = Popen(['pnmcrop', 'tikz-000001.ppm'], stdout=PIPE, stderr=PIPE)
-            else:
-                p1 = Popen(['pnmcrop', 'tikz.ppm'], stdout=PIPE, stderr=PIPE)
-        except OSError, err:
+            p1 = Popen(['pnmcrop', 'tikz.ppm'], stdout=PIPE, stderr=PIPE)
+        except OSError as err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
             self.builder.warn('pnmcrop command cannot be run:')
@@ -272,7 +233,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
         try:
             p2 = Popen(['pnmtopng'] + pnm_args, stdin=p1.stdout,
                        stdout=PIPE, stderr=PIPE)
-        except OSError, err:
+        except OSError as err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
             self.builder.warn('pnmtopng command cannot be run:')
@@ -308,8 +269,8 @@ def html_visit_tikzinline(self,node):
     libs = self.builder.config.tikz_tikzlibraries
     libs = libs.replace(' ', '').replace('\t', '').strip(', ')
     try:
-        fname = render_tikz(self,node,libs);
-    except TikzExtError, exc:
+        fname = render_tikz(self,node['tikz'],libs);
+    except TikzExtError as exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
                                   backrefs=[], source=node['tikz'])
@@ -330,8 +291,8 @@ def html_visit_tikz(self,node):
     libs = libs.replace(' ', '').replace('\t', '').strip(', ')
 
     try:
-        fname = render_tikz(self,node,libs,node['stringsubst'])
-    except TikzExtError, exc:
+        fname = render_tikz(self,node['tikz'],libs,node['stringsubst'])
+    except TikzExtError as exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
                                   backrefs=[], source=node['tikz'])
@@ -370,23 +331,15 @@ def latex_visit_tikzinline(self, node):
     raise nodes.SkipNode
 
 def latex_visit_tikz(self, node):
-    if node['include'] != '':
-        begTikzPic = ''
-        endTikzPic = ''
-        node['tikz']=node['tikz'].replace('\r\n','\n')
-    else:
-        begTikzPic = '\\begin{tikzpicture}'
-        endTikzPic = '\\end{tikzpicture}'
-
     if node['caption']:
         if node['stringsubst']:
             node['tikz'] = node['tikz'] % {'wd': getcwd()}
-        latex = '\\begin{figure}[htp]\\centering' + begTikzPic + \
-                node['tikz'] + endTikzPic + '\\caption{' + \
+        latex = '\\begin{figure}[htp]\\centering\\begin{tikzpicture}' + \
+                node['tikz'] + '\\end{tikzpicture}' + '\\caption{' + \
                 self.encode(node['caption']).strip() + '}\\end{figure}'
     else:
-        latex = '\\begin{center}' + begTikzPic + node['tikz'] + \
-            endTikzPic + '\\end{center}'
+        latex = '\\begin{center}\\begin{tikzpicture}' + node['tikz'] + \
+            '\\end{tikzpicture}\\end{center}'
     self.body.append(latex)
 
 def depart_tikz(self,node):
