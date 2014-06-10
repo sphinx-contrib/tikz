@@ -216,6 +216,26 @@ def render_tikz(self,tikz,libs='',stringsubst=False):
                                'error:\n[stderr]\n%s\n[stdout]\n%s'
                                % (stderr, stdout))
 
+    elif self.builder.config.tikz_proc_suite == 'pdf2svg':
+        try:
+            p1 = Popen(['pdf2svg', 'tikz.pdf', outfn],
+                       stdout=PIPE, stderr=PIPE)
+        except OSError, e:
+            if e.errno != ENOENT:   # No such file or directory
+                raise
+            self.builder.warn('pdf2svg command cannot be run')
+            self.builder.warn(err)
+            self.builder._tikz_warned = True
+            chdir(curdir)
+            return None
+        stdout, stderr = p1.communicate()
+        if p1.returncode != 0:
+            self.builder._tikz_warned = True
+            chdir(curdir)
+            raise TikzExtError('Error (tikz extension): pdf2svg exited with '
+                               'error:\n[stderr]\n%s\n[stdout]\n%s'
+                               % (stderr, stdout))
+
     elif self.builder.config.tikz_proc_suite == 'Netpbm':
         try:
             p1 = Popen(['pnmcrop', 'tikz-1.ppm'], stdout=PIPE, stderr=PIPE)
