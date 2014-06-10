@@ -115,6 +115,9 @@ DOC_BODY = r'''
 def render_tikz(self,tikz,libs='',stringsubst=False):
     hashkey = tikz.encode('utf-8')
     fname = 'tikz-%s.png' % (sha(hashkey).hexdigest())
+    # if we're converting to svg, then we use a different extension
+    if 'svg' in self.builder.config.tikz_proc_suite:
+        fname = 'tikz-%s.svg' % (sha(hashkey).hexdigest())
     relfn = posixpath.join(self.builder.imgpath, fname)
     outfn = path.join(self.builder.outdir, '_images', fname)
 
