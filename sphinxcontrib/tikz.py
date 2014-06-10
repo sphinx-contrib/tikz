@@ -407,8 +407,10 @@ def setup(app):
     app.add_config_value('tikz_transparent', True, 'html')
 
     # fallback to another value depending what is on the system
-    suite = 'Netpbm'
-    if not which('pnmcrop'):
-        suite = 'ImageMagick'
+    suite = 'pdf2svg'
+    if not which('pdf2svg'):
+        suite = 'Netpbm'
+        if not which('pnmcrop'):
+            suite = 'ImageMagick'
     app.add_config_value('tikz_proc_suite', suite, 'html')
     app.connect('build-finished', cleanup_tempdir)
