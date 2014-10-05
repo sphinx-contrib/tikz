@@ -127,7 +127,7 @@ class TikzDirective(Directive):
         return [node]
 
 DOC_HEAD = r'''
-\documentclass[12pt]{article}
+\documentclass[12pt]{standalone}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{tikz}
