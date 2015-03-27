@@ -89,8 +89,8 @@ class TikzDirective(Directive):
     def run(self):
         node = tikz()
 
-        node['include']=self.options.get('include', '')
-        if node['include'] != '':
+        if 'include' in self.options:
+            node['include'] = self.options['include']
             env = self.state.document.settings.env
             rel_filename, filename = env.relfn2path(node['include'])
             env.note_dependency(rel_filename)
@@ -162,7 +162,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
     latex += self.builder.config.tikz_latex_preamble
     if stringsubst:
         tikz = Template(tikz).substitute(wd=curdir.replace('\\','/'))
-    if node['include'] == '':
+    if 'include' not in node:
         tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
     latex += DOC_BODY % tikz
     if isinstance(latex, unicode):
@@ -370,7 +370,7 @@ def latex_visit_tikzinline(self, node):
     raise nodes.SkipNode
 
 def latex_visit_tikz(self, node):
-    if node['include'] != '':
+    if 'include' in node:
         begTikzPic = ''
         endTikzPic = ''
         node['tikz']=node['tikz'].replace('\r\n','\n')
