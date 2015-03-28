@@ -127,7 +127,7 @@ class TikzDirective(Directive):
         return [node]
 
 DOC_HEAD = r'''
-\documentclass[12pt]{standalone}
+\documentclass[12pt,preview,tikz]{standalone}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{tikz}
@@ -204,17 +204,23 @@ def render_tikz(self,node,libs='',stringsubst=False):
     #             '-trim', 'tikz.pdf', outfn], stdout=PIPE, stderr=PIPE)
     # stdout, stderr = p1.communicate()
 
+    if self.builder.config.tikz_transparent:
+        device = "pngalpha"
+    else:
+        device = "png256"
+
     try:
         if _Win_:
+            # TODO I do not know how this would work with windows
             p = Popen(['pdftoppm', '-r', '120', 'tikz.pdf', 'tikz'], 
                   stdout=PIPE, stderr=PIPE)
         else:
-            p = Popen(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf', 'tikz'],
-                  stdout=PIPE, stderr=PIPE)
+            p = Popen(['gs', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r100x100', '-f', 'tikz.pdf',],
+                  stdout=PIPE, stderr=PIPE, stdin=PIPE)
     except OSError, e:
         if e.errno != ENOENT:   # No such file or directory
             raise
-        self.builder.warn('pdftoppm command cannot be run')
+        self.builder.warn('gs command cannot be run')
         self.builder.warn(err)
         self.builder._tikz_warned = True
         chdir(curdir)
@@ -222,84 +228,8 @@ def render_tikz(self,node,libs='',stringsubst=False):
     stdout, stderr = p.communicate()
     if p.returncode != 0:
         self.builder._tikz_warned = True
-        raise TikzExtError('Error (tikz extension): pdftoppm exited with error:'
+        raise TikzExtError('Error (tikz extension): gs exited with error:'
                            '\n[stderr]\n%s\n[stdout]\n%s' % (stderr, stdout))
-
-    if self.builder.config.tikz_proc_suite == 'ImageMagick':
-        convert_args = []
-        if self.builder.config.tikz_transparent:
-            convert_args = ['-fuzz', '2%', '-transparent', 'white']
-
-        try:
-            p1 = Popen(['convert', '-trim'] + convert_args +
-                       ['tikz.ppm', outfn],
-                       stdout=PIPE, stderr=PIPE)
-        except OSError, e:
-            if e.errno != ENOENT:   # No such file or directory
-                raise
-            self.builder.warn('convert command cannot be run')
-            self.builder.warn(err)
-            self.builder._tikz_warned = True
-            chdir(curdir)
-            return None
-        stdout, stderr = p1.communicate()
-        if p1.returncode != 0:
-            self.builder._tikz_warned = True
-            chdir(curdir)
-            raise TikzExtError('Error (tikz extension): convert exited with '
-                               'error:\n[stderr]\n%s\n[stdout]\n%s'
-                               % (stderr, stdout))
-
-    elif self.builder.config.tikz_proc_suite == 'Netpbm':
-        try:
-            if _Win_:
-                p1 = Popen(['pnmcrop', 'tikz-000001.ppm'], stdout=PIPE, stderr=PIPE)
-            else:
-                p1 = Popen(['pnmcrop', 'tikz.ppm'], stdout=PIPE, stderr=PIPE)
-        except OSError, err:
-            if err.errno != ENOENT:   # No such file or directory
-                raise
-            self.builder.warn('pnmcrop command cannot be run:')
-            self.builder.warn(err)
-            self.builder._tikz_warned = True
-            chdir(curdir)
-            return None
-
-        pnm_args = []
-        if self.builder.config.tikz_transparent:
-            pnm_args = ['-transparent', 'rgb:ff/ff/ff']
-
-        try:
-            p2 = Popen(['pnmtopng'] + pnm_args, stdin=p1.stdout,
-                       stdout=PIPE, stderr=PIPE)
-        except OSError, err:
-            if err.errno != ENOENT:   # No such file or directory
-                raise
-            self.builder.warn('pnmtopng command cannot be run:')
-            self.builder.warn(err)
-            self.builder._tikz_warned = True
-            chdir(curdir)
-            return None
-
-        pngdata, stderr2 = p2.communicate()
-        dummy, stderr1 = p1.communicate()
-        if p1.returncode != 0:
-            self.builder._tikz_warned = True
-            raise TikzExtError('Error (tikz extension): pnmcrop exited with '
-                               'error:\n[stderr]\n%s' % (stderr1))
-        if p2.returncode != 0:
-            self.builder._tikz_warned = True
-            raise TikzExtError('Error (tikz extension): pnmtopng exited with '
-                               'error:\n[stderr]\n%s' % (stderr2))
-        f = open(outfn,'wb')
-        f.write(pngdata)
-        f.close()
-
-    else:
-        self.builder._tikz_warned = True
-        chdir(curdir)
-        raise TikzExtError('Error (tikz extension): Invalid configuration '
-                           'value for tikz_proc_suite')
 
     chdir(curdir)
     return relfn
@@ -414,5 +344,4 @@ def setup(app):
     app.add_config_value('tikz_latex_preamble', '', 'html')
     app.add_config_value('tikz_tikzlibraries', '', 'html')
     app.add_config_value('tikz_transparent', True, 'html')
-    app.add_config_value('tikz_proc_suite', 'Netpbm', 'html')
     app.connect('build-finished', cleanup_tempdir)
