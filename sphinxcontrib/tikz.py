@@ -183,7 +183,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
         try:
             p = Popen(['pdflatex', '--interaction=nonstopmode', 'tikz.tex'],
                       stdout=PIPE, stderr=PIPE)
-        except OSError, err:
+        except OSError as err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
             self.builder.warn('LaTeX command cannot be run')
@@ -217,7 +217,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
         else:
             p = Popen(['gs', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r100x100', '-f', 'tikz.pdf',],
                   stdout=PIPE, stderr=PIPE, stdin=PIPE)
-    except OSError, e:
+    except OSError as e:
         if e.errno != ENOENT:   # No such file or directory
             raise
         self.builder.warn('gs command cannot be run')
@@ -239,7 +239,7 @@ def html_visit_tikzinline(self,node):
     libs = libs.replace(' ', '').replace('\t', '').strip(', ')
     try:
         fname = render_tikz(self,node,libs);
-    except TikzExtError, exc:
+    except TikzExtError as exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
                                   backrefs=[], source=node['tikz'])
@@ -261,7 +261,7 @@ def html_visit_tikz(self,node):
 
     try:
         fname = render_tikz(self,node,libs,node['stringsubst'])
-    except TikzExtError, exc:
+    except TikzExtError as exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
                                   backrefs=[], source=node['tikz'])
