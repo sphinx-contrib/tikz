@@ -210,17 +210,12 @@ def render_tikz(self,node,libs='',stringsubst=False):
         device = "png256"
 
     try:
-        if _Win_:
-            # TODO I do not know how this would work with windows
-            p = Popen(['pdftoppm', '-r', '120', 'tikz.pdf', 'tikz'], 
-                  stdout=PIPE, stderr=PIPE)
-        else:
-            p = Popen(['gs', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r100x100', '-f', 'tikz.pdf',],
-                  stdout=PIPE, stderr=PIPE, stdin=PIPE)
+        p = Popen(['ghostscript', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r100x100', '-f', 'tikz.pdf',],
+              stdout=PIPE, stderr=PIPE, stdin=PIPE)
     except OSError as e:
         if e.errno != ENOENT:   # No such file or directory
             raise
-        self.builder.warn('gs command cannot be run')
+        self.builder.warn('ghostscript command cannot be run')
         self.builder.warn(err)
         self.builder._tikz_warned = True
         chdir(curdir)
@@ -228,7 +223,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
     stdout, stderr = p.communicate()
     if p.returncode != 0:
         self.builder._tikz_warned = True
-        raise TikzExtError('Error (tikz extension): gs exited with error:'
+        raise TikzExtError('Error (tikz extension): ghostscript exited with error:'
                            '\n[stderr]\n%s\n[stdout]\n%s' % (stderr, stdout))
 
     chdir(curdir)
