@@ -44,6 +44,7 @@ import posixpath
 import shutil
 import sys
 import codecs
+import os
 
 from os import path, getcwd, chdir, mkdir, system
 from string import Template
@@ -168,12 +169,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
     if isinstance(latex, unicode):
         latex = latex.encode('utf-8')
 
-    if not hasattr(self.builder, '_tikz_tempdir'):
-        tempdir = self.builder._tikz_tempdir = tempfile.mkdtemp()
-    else:
-        tempdir = self.builder._tikz_tempdir
-
-    chdir(tempdir)
+    chdir(app.builder._tikz_tempdir)
 
     tf = open('tikz.tex', 'wb')
     tf.write(latex)
@@ -197,7 +193,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
         raise TikzExtError('Error (tikz extension): latex exited with error:\n'
                            '[stderr]\n%s\n[stdout]\n%s' % (stderr, stdout))
 
-    chdir(tempdir)
+    chdir(app.builder._tikz_tempdir)
 
     # the following does not work for pdf patterns
     # p1 = Popen(['convert', '-density', '120', '-colorspace', 'rgb',
@@ -327,6 +323,23 @@ def cleanup_tempdir(app, exc):
     except Exception:
         pass
 
+def builder_inited(app):
+    app.builder._tikz_tempdir = tempfile.mkdtemp()
+
+    if app.builder.name == "latex":
+        sty_path = os.path.join(app.builder._tikz_tempdir, "sphinxcontribtikz.sty")
+        sty = open(sty_path, mode="w")
+        sty.write(r"\RequirePackage{tikz}" + "\n")
+        sty.write(r"\RequirePackage{amsmath}" + "\n")
+        sty.write(r"\RequirePackage{amsfonts}" + "\n")
+        sty.write(r"\RequirePackage{pgfplots}" + "\n")
+        sty.write(app.builder.config.tikz_latex_preamble + "\n")
+        sty.write(r"\usetikzlibrary{%s}" % app.builder.config.tikz_tikzlibraries.replace(' ', '').replace('\t', '').strip(', ') + "\n")
+        sty.close()
+
+        app.builder.config.latex_additional_files.append(sty_path)
+        app.add_latex_package("sphinxcontribtikz")
+
 def setup(app):
     app.add_node(tikz,
                  html=(html_visit_tikz, depart_tikz),
@@ -340,3 +353,4 @@ def setup(app):
     app.add_config_value('tikz_tikzlibraries', '', 'html')
     app.add_config_value('tikz_transparent', True, 'html')
     app.connect('build-finished', cleanup_tempdir)
+    app.connect('builder-inited', builder_inited)
