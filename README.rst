@@ -256,6 +256,23 @@ Example of a plot imported from a file:
   :libs: arrows
   :include: NewGM-Armijo2.tikz
 
+An example of use of `tikz_tikzlibraries` and `tikz_latex_preamble` options (by `Dominik Haumann <http://www.texample.net/tikz/examples/double-arrows/>`_).
+
+.. tikz::
+
+      \node[draw,rectangle] (a) {A};
+      \node[inner sep=0,minimum size=0,right of=a] (k) {}; % invisible node
+      \node[draw,rectangle,right of=k] (b) {B};
+      \node[draw,rectangle,below of=a] (c) {C};
+
+      % 1st pass: draw arrows
+      \draw[vecArrow] (a) to (b);
+      \draw[vecArrow] (k) |- (c);
+
+      % 2nd pass: copy all from 1st pass, and replace vecArrow with innerWhite
+      \draw[innerWhite] (a) to (b);
+      \draw[innerWhite] (k) |- (c);
+
 Caveats
 =======
 
