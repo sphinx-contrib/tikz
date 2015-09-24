@@ -169,7 +169,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
     if isinstance(latex, unicode):
         latex = latex.encode('utf-8')
 
-    chdir(app.builder._tikz_tempdir)
+    chdir(self.builder._tikz_tempdir)
 
     tf = open('tikz.tex', 'wb')
     tf.write(latex)
@@ -193,7 +193,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
         raise TikzExtError('Error (tikz extension): latex exited with error:\n'
                            '[stderr]\n%s\n[stdout]\n%s' % (stderr, stdout))
 
-    chdir(app.builder._tikz_tempdir)
+    chdir(self.builder._tikz_tempdir)
 
     # the following does not work for pdf patterns
     # p1 = Popen(['convert', '-density', '120', '-colorspace', 'rgb',
