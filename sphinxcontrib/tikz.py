@@ -206,7 +206,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
         device = "png256"
 
     try:
-        p = Popen(['ghostscript', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r100x100', '-f', 'tikz.pdf',],
+        p = Popen(['ghostscript', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r120x120', '-f', 'tikz.pdf',],
               stdout=PIPE, stderr=PIPE, stdin=PIPE)
     except OSError as e:
         if e.errno != ENOENT:   # No such file or directory
