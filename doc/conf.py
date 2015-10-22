@@ -101,6 +101,7 @@ tikz_latex_preamble = r"""
    postaction = {draw,line width=1.4pt, white,shorten >= 4.5pt}]
 \tikzstyle{innerWhite} = [semithick, white,line width=1.4pt, shorten >= 4.5pt]
 """
+tikz_proc_suite = "GhostScript"
 
 # -- Options for HTML output ---------------------------------------------------
 

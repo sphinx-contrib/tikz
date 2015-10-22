@@ -31,19 +31,16 @@ Prerequisites
 On your computer the following must be installed:
 
 * ``latex`` with the ``tikz`` and the ``amsmath`` packages
-* ``ghostscript``
-
-(We cannot use ``dvipng`` as the ``pngmath`` Sphinx extension does because there
-is an issue with cropping the image if postscript specials are used.)
+* ``pdftoppm`` (part of the Poppler pdf library)
+* one of :
+    * ``ghostscript``;
+    * ``pnmtopng`` (part of the Netpbm package);
+    * ``convert`` (part of the ImageMagick package).
 
 For **Ubuntu Linux** you roughly have to have the following packages installed:
 
 * ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
-* ``ghostscript``
-
-For **Mac OS X** a possible way of getting this extension working is:
-
-TODO: How to install ghostscript on MAC?
+* ``netpbm``, ``imagemagick`` or ``ghostscript``.
 
 * Install `homebrew <http://mxcl.github.com/homebrew/>`__ in the terminal by::
 
@@ -54,8 +51,6 @@ TODO: How to install ghostscript on MAC?
     brew install poppler
 
 For **Windows** you will need to install this two packages:
-
-TODO: How to install ghostscript on Windows?
 
 * `Xpdf package <http://www.foolabs.com/xpdf/download.html>`__
 * `NetPbm for Windows package <http://gnuwin32.sourceforge.net/packages/netpbm.htm>`__
@@ -68,7 +63,6 @@ TODO: How to install ghostscript on Windows?
   
     From NetPbm
   
-    * ``pnmcrop.exe`` 
     * ``pnmtopng.exe``
     * ``libnetpbm10.dll``
     * ``libpng13.dll``
@@ -77,18 +71,6 @@ TODO: How to install ghostscript on Windows?
     Put these files in one folder and add the folder to the system path. 
 
     Also, you need to create a new system variable *RGBDEF=C:\\TikzSphinx\\rgb.txt* assuming you copy the files to the C:\\TikzSphinx folder.
-
-  Additional note to windows install: If using an earlier version of the extension, you may need to modify the tikz.py file. Line
-
-    .. code-block:: python
-
-      p1 = Popen(['pnmcrop', 'tikz-1.ppm'], stdout=PIPE, stderr=PIPE)
-
-    To:
-
-    .. code-block:: python
-
-      p1 = Popen(['pnmcrop', 'tikz-000001.ppm'], stdout=PIPE, stderr=PIPE) 
 
 Configuration
 -------------
@@ -114,6 +96,15 @@ Also in ``conf.py``, you have to specify the LaTeX preamble in the
 
 Additionally, the following configuration values are supported for the ``html``
 build target:
+
+* Choose the image processing ``‹suite›``, either ``'Netpbm'``,
+  ``GhostScript``, or ``'ImageMagick'`` (``'Netpbm'`` by default)::
+
+    tikz_proc_suite = ‹suite›
+
+  Note that if you want your documentation to be built on
+  http://readthedocs.org, you have to choose ``ghostscript``.
+
 
 * Enable/disable transparent graphics (enabled by default)::
 
