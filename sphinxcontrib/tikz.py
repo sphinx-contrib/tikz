@@ -213,11 +213,6 @@ def render_tikz(self,node,libs='',stringsubst=False):
 
         system(['pdflatex', '--interaction=nonstopmode', 'tikz.tex'], self.builder)
 
-        if self.builder.config.tikz_proc_suite not in ['ImageMagick', 'Netpbm', 'GhostScript']:
-            self.builder._tikz_warned = True
-            raise TikzExtError('Error (tikz extension): Invalid configuration '
-                               'value for tikz_proc_suite')
-
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
             if _Win_:
@@ -245,6 +240,11 @@ def render_tikz(self,node,libs='',stringsubst=False):
             else:
                 device = "png256"
             system(['ghostscript', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r120x120', '-f', 'tikz.pdf'], self.builder)
+        else:
+            self.builder._tikz_warned = True
+            raise TikzExtError('Error (tikz extension): Invalid configuration '
+                               'value for tikz_proc_suite')
+
 
         return relfn
 
