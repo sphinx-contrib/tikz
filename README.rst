@@ -31,11 +31,10 @@ Prerequisites
 On your computer the following must be installed:
 
 * ``latex`` with the ``tikz`` and the ``amsmath`` packages
-* ``pdftoppm`` (part of the Poppler pdf library)
 * one of :
-    * ``ghostscript``;
-    * ``pnmtopng`` (part of the Netpbm package);
-    * ``convert`` (part of the ImageMagick package).
+    * ``pdftoppm`` (part of the Poppler pdf library) and  ``pnmtopng`` (part of the Netpbm package);
+    * ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of the ImageMagick package);
+    * ``ghostscript``.
 
 For **Ubuntu Linux** you roughly have to have the following packages installed:
 
@@ -103,7 +102,7 @@ build target:
     tikz_proc_suite = ‹suite›
 
   Note that if you want your documentation to be built on
-  http://readthedocs.org, you have to choose ``ghostscript``.
+  http://readthedocs.org, you have to choose ``GhostScript``.
 
 
 * Enable/disable transparent graphics (enabled by default)::
