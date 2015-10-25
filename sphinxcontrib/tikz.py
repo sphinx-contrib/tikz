@@ -86,7 +86,6 @@ def system(command, builder, outfile=None):
     """
     binary = command[0]
     try:
-        print("RUNNING", command)
         process = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
