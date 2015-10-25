@@ -86,6 +86,7 @@ def system(command, builder, outfile=None):
     """
     binary = command[0]
     try:
+        print("RUNNING", command)
         process = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
@@ -180,10 +181,17 @@ DOC_BODY = r'''
 \end{document}
 '''
 
+OUT_EXTENSION = {
+    'GhostScript': 'png',
+    'ImageMagick': 'png',
+    'Netpbm': 'png',
+    'pdf2svg': 'svg',
+    }
+
 def render_tikz(self,node,libs='',stringsubst=False):
     tikz = node['tikz']
     hashkey = tikz.encode('utf-8')
-    fname = 'tikz-%s.png' % (sha(hashkey).hexdigest())
+    fname = 'tikz-%s.%s' % (sha(hashkey).hexdigest(), OUT_EXTENSION[self.builder.config.tikz_proc_suite])
     relfn = posixpath.join(self.builder.imgpath, fname)
     outfn = path.join(self.builder.outdir, '_images', fname)
 
@@ -240,6 +248,8 @@ def render_tikz(self,node,libs='',stringsubst=False):
             else:
                 device = "png256"
             system(['ghostscript', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r120x120', '-f', 'tikz.pdf'], self.builder)
+        elif self.builder.config.tikz_proc_suite == "pdf2svg":
+            system(['pdf2svg', 'tikz.pdf', outfn], self.builder)
         else:
             self.builder._tikz_warned = True
             raise TikzExtError('Error (tikz extension): Invalid configuration '

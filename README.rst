@@ -34,12 +34,13 @@ On your computer the following must be installed:
 * one of :
     * ``pdftoppm`` (part of the Poppler pdf library) and  ``pnmtopng`` (part of the Netpbm package);
     * ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of the ImageMagick package);
-    * ``ghostscript``.
+    * ``ghostscript``;
+    * ``pdf2svg``.
 
 For **Ubuntu Linux** you roughly have to have the following packages installed:
 
 * ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
-* ``netpbm``, ``imagemagick`` or ``ghostscript``.
+* ``netpbm``, ``imagemagick``, ``ghostscript``, or ``pdf2svg``.
 
 * Install `homebrew <http://mxcl.github.com/homebrew/>`__ in the terminal by::
 
@@ -97,12 +98,16 @@ Additionally, the following configuration values are supported for the ``html``
 build target:
 
 * Choose the image processing ``‹suite›``, either ``'Netpbm'``,
-  ``GhostScript``, or ``'ImageMagick'`` (``'Netpbm'`` by default)::
+  ``'GhostScript'``, ``'ImageMagick'``, ``'pdf2svg'`` (``'Netpbm'`` by
+  default)::
 
     tikz_proc_suite = ‹suite›
 
-  Note that if you want your documentation to be built on
-  http://readthedocs.org, you have to choose ``GhostScript``.
+  Note that:
+
+  * if you want your documentation to be built on http://readthedocs.org, you
+    have to choose ``GhostScript``;
+  * all suites produce png images, excepted ``'pdf2svg'`` which produces svg.
 
 
 * Enable/disable transparent graphics (enabled by default)::
