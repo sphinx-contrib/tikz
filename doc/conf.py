@@ -91,11 +91,23 @@ pygments_style = 'sphinx'
 #modindex_common_prefix = []
 
 
+# -- Options specific to sphinxcontrib-tikz ------------------------------------
+
+tikz_tikzlibraries = 'arrows, decorations.markings'
+tikz_latex_preamble = r"""
+\tikzstyle{vecArrow} = [thick, decoration={markings,mark=at position 1 with {\arrow[semithick]{open triangle 60}}},
+   double distance=1.4pt, shorten >= 5.5pt,
+   preaction = {decorate},
+   postaction = {draw,line width=1.4pt, white,shorten >= 4.5pt}]
+\tikzstyle{innerWhite} = [semithick, white,line width=1.4pt, shorten >= 4.5pt]
+"""
+tikz_proc_suite = "GhostScript"
+
 # -- Options for HTML output ---------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+#html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

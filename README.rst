@@ -31,22 +31,16 @@ Prerequisites
 On your computer the following must be installed:
 
 * ``latex`` with the ``tikz`` and the ``amsmath`` packages
-* ``pdftoppm`` (part of the Poppler pdf library)
-* either of the following:
-
-  - ``pnmcrop`` and ``pnmtopng`` (both part of the Netpbm package)
-  - ``convert`` (part of the ImageMagick package)
-
-(We cannot use ``dvipng`` as the ``pngmath`` Sphinx extension does because there
-is an issue with cropping the image if postscript specials are used.)
+* one of :
+    * ``pdftoppm`` (part of the Poppler pdf library) and  ``pnmtopng`` (part of the Netpbm package);
+    * ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of the ImageMagick package);
+    * ``ghostscript``;
+    * ``pdf2svg``.
 
 For **Ubuntu Linux** you roughly have to have the following packages installed:
 
 * ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
-* ``poppler-utils``
-* ``netpbm`` or ``imagemagick``
-
-For **Mac OS X** a possible way of getting this extension working is:
+* ``netpbm``, ``imagemagick``, ``ghostscript``, or ``pdf2svg``.
 
 * Install `homebrew <http://mxcl.github.com/homebrew/>`__ in the terminal by::
 
@@ -69,7 +63,6 @@ For **Windows** you will need to install this two packages:
   
     From NetPbm
   
-    * ``pnmcrop.exe`` 
     * ``pnmtopng.exe``
     * ``libnetpbm10.dll``
     * ``libpng13.dll``
@@ -78,18 +71,6 @@ For **Windows** you will need to install this two packages:
     Put these files in one folder and add the folder to the system path. 
 
     Also, you need to create a new system variable *RGBDEF=C:\\TikzSphinx\\rgb.txt* assuming you copy the files to the C:\\TikzSphinx folder.
-
-  Additional note to windows install: If using an earlier version of the extension, you may need to modify the tikz.py file. Line
-
-    .. code-block:: python
-
-      p1 = Popen(['pnmcrop', 'tikz-1.ppm'], stdout=PIPE, stderr=PIPE)
-
-    To:
-
-    .. code-block:: python
-
-      p1 = Popen(['pnmcrop', 'tikz-000001.ppm'], stdout=PIPE, stderr=PIPE) 
 
 Configuration
 -------------
@@ -116,10 +97,18 @@ Also in ``conf.py``, you have to specify the LaTeX preamble in the
 Additionally, the following configuration values are supported for the ``html``
 build target:
 
-* Choose the image processing ``‹suite›``, either ``'Netpbm'`` or
-  ``'ImageMagick'`` (``'Netpbm'`` by default)::
+* Choose the image processing ``‹suite›``, either ``'Netpbm'``,
+  ``'GhostScript'``, ``'ImageMagick'``, ``'pdf2svg'`` (``'Netpbm'`` by
+  default)::
 
     tikz_proc_suite = ‹suite›
+
+  Note that:
+
+  * if you want your documentation to be built on http://readthedocs.org, you
+    have to choose ``GhostScript``;
+  * all suites produce png images, excepted ``'pdf2svg'`` which produces svg.
+
 
 * Enable/disable transparent graphics (enabled by default)::
 
@@ -261,6 +250,23 @@ Example of a plot imported from a file:
 .. tikz:: 
   :libs: arrows
   :include: NewGM-Armijo2.tikz
+
+An example of use of `tikz_tikzlibraries` and `tikz_latex_preamble` options (by `Dominik Haumann <http://www.texample.net/tikz/examples/double-arrows/>`_).
+
+.. tikz::
+
+      \node[draw,rectangle] (a) {A};
+      \node[inner sep=0,minimum size=0,right of=a] (k) {}; % invisible node
+      \node[draw,rectangle,right of=k] (b) {B};
+      \node[draw,rectangle,below of=a] (c) {C};
+
+      % 1st pass: draw arrows
+      \draw[vecArrow] (a) to (b);
+      \draw[vecArrow] (k) |- (c);
+
+      % 2nd pass: copy all from 1st pass, and replace vecArrow with innerWhite
+      \draw[innerWhite] (a) to (b);
+      \draw[innerWhite] (k) |- (c);
 
 Caveats
 =======
