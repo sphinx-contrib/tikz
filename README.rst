@@ -31,7 +31,7 @@ Prerequisites
 On your computer the following must be installed:
 
 * ``latex`` with the ``tikz`` and the ``amsmath`` packages
-* one of :
+* one of:
     * ``pdftoppm`` (part of the Poppler pdf library) and  ``pnmtopng`` (part of the Netpbm package);
     * ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of the ImageMagick package);
     * ``ghostscript``;
@@ -41,10 +41,10 @@ For **Ubuntu Linux** you roughly have to have the following packages installed:
 
 * ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
 * one of (depending on the suite — see below):
-  * ``poppler-utils`` and ``netpbm`` (for the ``pdftoppm`` suite);
-  * ``imagemagick``   and ``netpbm`` (for the ``ImageMagick`` suite);
-  * ``ghostscript`` (for the ``GhostScript`` suite);
-  * ``pdf2svg`` (for the ``pdf2svg`` suite).
+    * ``poppler-utils`` and ``netpbm`` (for the ``pdftoppm`` suite);
+    * ``imagemagick``   and ``netpbm`` (for the ``ImageMagick`` suite);
+    * ``ghostscript`` (for the ``GhostScript`` suite);
+    * ``pdf2svg`` (for the ``pdf2svg`` suite).
 
 For **Mac OS X** a possible way of getting this extension working is:
 
