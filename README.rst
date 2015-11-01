@@ -40,7 +40,13 @@ On your computer the following must be installed:
 For **Ubuntu Linux** you roughly have to have the following packages installed:
 
 * ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
-* ``netpbm``, ``imagemagick``, ``ghostscript``, or ``pdf2svg``.
+* one of (depending on the suite — see below):
+  * ``poppler-utils`` and ``netpbm`` (for the ``pdftoppm`` suite);
+  * ``imagemagick``   and ``netpbm`` (for the ``ImageMagick`` suite);
+  * ``ghostscript`` (for the ``GhostScript`` suite);
+  * ``pdf2svg`` (for the ``pdf2svg`` suite).
+
+For **Mac OS X** a possible way of getting this extension working is:
 
 * Install `homebrew <http://mxcl.github.com/homebrew/>`__ in the terminal by::
 
