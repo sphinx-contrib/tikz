@@ -40,7 +40,7 @@ For **Ubuntu Linux** you roughly have to have the following packages installed:
 
 * ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
 * one of (depending on the suite — see below):
-    * ``poppler-utils`` and ``netpbm`` (for the ``pdftoppm`` suite);
+    * ``poppler-utils`` and ``netpbm`` (for the ``Netpbm`` suite);
     * ``imagemagick``   and ``netpbm`` (for the ``ImageMagick`` suite);
     * ``ghostscript`` (for the ``GhostScript`` suite);
     * ``pdf2svg`` (for the ``pdf2svg`` suite).
