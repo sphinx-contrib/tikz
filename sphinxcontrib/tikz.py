@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2012-2013 by Christoph Reller. All rights reserved.
+# Copyright (c) 2012-2015 by Christoph Reller. All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -67,6 +67,8 @@ except:
 from sphinx.util.compat import Directive
 
 _Win_ = sys.platform[0:3] == 'win'
+
+# TODO: Check existence of executables with subprocess.check_call
 
 @contextlib.contextmanager
 def changedir(directory):
@@ -209,8 +211,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
     if 'include' not in node:
         tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
     latex += DOC_BODY % tikz
-    if isinstance(latex, unicode):
-        latex = latex.encode('utf-8')
+    latex = latex.encode('utf-8')
 
     with changedir(self.builder._tikz_tempdir):
 
@@ -222,10 +223,7 @@ def render_tikz(self,node,libs='',stringsubst=False):
 
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
-            if _Win_:
-                system(['pdftoppm', '-r', '120', 'tikz.pdf', 'tikz'], self.builder)
-            else:
-                system(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf', 'tikz'], self.builder)
+            system(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf', 'tikz'], self.builder)
 
             if self.builder.config.tikz_proc_suite == "ImageMagick":
                 if self.builder.config.tikz_transparent:
@@ -246,7 +244,10 @@ def render_tikz(self,node,libs='',stringsubst=False):
                 device = "pngalpha"
             else:
                 device = "png256"
-            system(['ghostscript', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r120x120', '-f', 'tikz.pdf'], self.builder)
+            if _Win_:
+                system(['gswin64c', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r120x120', '-f', 'tikz.pdf'], self.builder)
+            else:
+                system(['ghostscript', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r120x120', '-f', 'tikz.pdf'], self.builder)
         elif self.builder.config.tikz_proc_suite == "pdf2svg":
             system(['pdf2svg', 'tikz.pdf', outfn], self.builder)
         else:
