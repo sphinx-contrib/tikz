@@ -15,10 +15,10 @@ without further notice.
 
 ----
 
-:Version: 0.4.1
+:Version: 0.4.2
 :Author: Christoph Reller ``christoph.reller@gmail.com``
 :License: `BSD License <http://opensource.org/licenses/bsd-license.html>`__
-:Download: `tikz.py <http://people.ee.ethz.ch/~creller/web/_static/tikz.py>`__
+:Download: `tikz.py <http://reller.nightcolours.ch/web/_static/tikz.py>`__
 :Git Repository: https://bitbucket.org/philexander/tikz
 :PyPI Package: http://pypi.python.org/pypi/sphinxcontrib-tikz
 
@@ -28,49 +28,103 @@ Prerequisites and Configuration
 Prerequisites
 -------------
 
-On your computer the following must be installed:
+This extension relies on two software packages being installed on your computer:
 
-* ``latex`` with the ``tikz`` and the ``amsmath`` packages
-* one of :
-    * ``pdftoppm`` (part of the Poppler pdf library) and  ``pnmtopng`` (part of the Netpbm package);
-    * ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of the ImageMagick package);
-    * ``ghostscript``;
-    * ``pdf2svg``.
+A. LaTeX with the ``tikz`` package.
 
-For **Ubuntu Linux** you roughly have to have the following packages installed:
+B. A software package that is able to convert a PDF to an image.  Currently,
+   this extension supports four different ways of doing this conversion.  We
+   call them conversion "suites" and list for each suite what must be installed
+   on your computer: (Only one such suite need be installed.)
 
-* ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
-* ``netpbm``, ``imagemagick``, ``ghostscript``, or ``pdf2svg``.
+   The Netpbm suite
+      ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of
+      the ImageMagick package)
 
-* Install `homebrew <http://mxcl.github.com/homebrew/>`__ in the terminal by::
+   The pdf2svg suite
+      ``pdf2svg``
 
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/gist/323731)"
+   The GhostScript suite
+      ``ghostscript``
 
-* Install ``poppler`` (``pdftoppm`` comes with it), by::
-    
-    brew install poppler
+   The ImageMagick suite
+      ``pdftoppm`` (part of the Poppler pdf library) and ``pnmtopng`` (part of
+      the Netpbm package)
 
-For **Windows** you will need to install this two packages:
+For **Ubuntu Linux** you roughly have to make sure that the following packages
+are installed:
 
-* `Xpdf package <http://www.foolabs.com/xpdf/download.html>`__
-* `NetPbm for Windows package <http://gnuwin32.sourceforge.net/packages/netpbm.htm>`__
-  
-  If you don't want to install these packages, you can use only the files nedded.
-  
-    From Xpdf
+A. ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
 
-    * ``pdftoppm`` 
-  
-    From NetPbm
-  
-    * ``pnmtopng.exe``
-    * ``libnetpbm10.dll``
-    * ``libpng13.dll``
-    * ``rgb.txt``
+B. Depending on the chosen conversion suite the following package(s) have to be
+   installed:
 
-    Put these files in one folder and add the folder to the system path. 
+   * Netpbm suite: ``poppler-utils`` and ``netpbm``
+   * pdf2svg suite: ``pdf2svg``
+   * GhostScript suite: ``ghostscript``
+   * ImageMagick suite: ``poppler-utils`` and ``imagemagick``
 
-    Also, you need to create a new system variable *RGBDEF=C:\\TikzSphinx\\rgb.txt* assuming you copy the files to the C:\\TikzSphinx folder.
+For **Mac OS X** a possible way of getting this extension working is to install
+the `MacTeX <http://tug.org/mactex/>`__ LaTeX distribution which per default comes
+with the ``tikz`` package.  To install one of the conversion suites you can
+install `homebrew <http://mxcl.github.com/homebrew/>`__ and then use homebrew to
+install the package(s) listed under B. as above for Ubuntu Linux.
+
+For **Windows** do the following:
+
+A. Install the `MiKTeX <http://miktex.org/>`__ LaTeX distribution and include
+   the ``tikz`` package when installing.
+
+B. Depending on the chosen conversion suite, you have to install the following:
+
+   * Netpbm suite:
+
+     - `Xpdf package <http://www.foolabs.com/xpdf/download.html>`__
+     - `NetPbm for Windows package
+       <http://gnuwin32.sourceforge.net/packages/netpbm.HTML>`__
+
+     If you don't want to install the full packages above, you can copy the
+     following files to some directory and add this directory to the ``PATH``
+     environment variable:
+
+     From Xpdf:
+
+     * ``pdftoppm``
+
+     From NetPbm:
+
+     * ``pnmtopng.exe``
+     * ``libnetpbm10.dll``
+     * ``libpng13.dll``
+     * ``rgb.txt``
+
+     Also, you need to create a new environment variable
+     ``RGBDEF=C:\\TikzSphinx\\rgb.txt`` assuming you copy the files to the
+     ``C:\\TikzSphinx`` directory.
+
+   * pdf2svg suite:
+
+     Get the Windows binaries from `GitHub
+     <https://github.com/jalios/pdf2svg-windows>`__ copy all the files to some
+     directory and add this directory to the ``PATH`` environment variable.
+
+   * GhostScript suite:
+
+     Get the GhostScript binary from `here
+     <http://www.ghostscript.com/download/gsdnld.html>`__, rename the binary to
+     ``ghostscript.exe``, copy it to some directory and add this directory to
+     the ``PATH`` environment variable.  Instead of renaming the binary you can
+     also use ``mklink`` in a administrator command shell to make a link named
+     ``ghostscript.exe`` to the original binary.
+
+   * ImageMagick suite:
+
+     Install Xpdf (as described for the Netpbm suite) and install ImageMagick
+     from `here <http://www.imagemagick.org/script/binary-releases.php>`__.
+
+.. highlight:: python
+
+.. _configuration:
 
 Configuration
 -------------
@@ -78,73 +132,60 @@ Configuration
 If you have installed the Ti\ *k*\ z Sphinx extension e.g. using `PyPI
 <http://pypi.python.org/pypi/sphinxcontrib-tikz>`__, then you have to load the
 extension in the Sphinx project configuration file ``conf.py`` by::
- 
+
   extensions = ['sphinxcontrib.tikz']
-
-Also in ``conf.py``, you have to specify the LaTeX preamble in the
-``latex_elements`` dictionary, adding the tikz package and any other package or library used by the tikz pictures as::
-
-  latex_elements = {
-  ‹...›
-  'preamble': '''
-  \usepackage{tikz}
-  \usepackage{pgfplots}
-  \usetikzlibrary{arrows}
-  ''',
-  ‹...›
-  }
 
 Additionally, the following configuration values are supported for the ``html``
 build target:
 
-* Choose the image processing ``‹suite›``, either ``'Netpbm'``,
-  ``'GhostScript'``, ``'ImageMagick'``, ``'pdf2svg'`` (``'Netpbm'`` by
-  default)::
+* Choose the image processing ``‹suite›``, either ``'Netpbm'``, ``'pdf2svg'``,
+  ``'GhostScript'``, ``'ImageMagick'`` (``'Netpbm'`` by default)::
 
     tikz_proc_suite = ‹suite›
 
-  Note that:
+.. note::
 
-  * if you want your documentation to be built on http://readthedocs.org, you
-    have to choose ``GhostScript``;
-  * all suites produce png images, excepted ``'pdf2svg'`` which produces svg.
-
+  * If you want your documentation to be built on http://readthedocs.org, you
+    have to choose ``GhostScript``.
+  * All suites produce png images, excepted ``'pdf2svg'`` which produces svg.
 
 * Enable/disable transparent graphics (enabled by default)::
 
     tikz_transparent = ‹True or False›
 
-* Add ``‹string›`` to the LaTeX preamble::
+* Add ``‹string›`` to the LaTeX preamble used for building the Ti\ *k*\ Z
+  picture::
 
     tikz_latex_preamble = ‹string›
 
-* Add ``\usetikzlibrary{‹string›}`` to the LaTeX preamble::
+* Add ``\usetikzlibrary{‹string›}`` to the LaTeX preamble used for building the
+  Ti\ *k*\ Z picture::
 
     tikz_tikzlibraries = ‹string›
 
 .. note:: The above configuration values only apply to the ``html`` build
    target.  If you want to use the ``latex`` target, then you have to take care
    to include in the preamble for the ``latex`` target:
-   
+
    * The ``tikz_latex_preamble``
    * The ``tikz_libraries``
    * Any ``‹tikz libraries›`` given to the ``libs`` option of the ``tikz``
      directive (see :ref:`usage`)
 
-   This can be done, e.g., as::
+   I recommend to do this as follows::
 
      latex_elements = {
-     ‹...›
-     'preamble': '''\usepackage{tikz}''' + '''
-     \usetikzlibrary{''' + tikz_tikzlibraries + ‹tikz libraries› + '''}'''
-     ‹...›
+         # ‹...›
+	 'preamble': '''\usepackage{tikz}''' + tikz_latex_preamble + '''
+	 \usetikzlibrary{''' + tikz_tikzlibraries + "‹tikz libraries›" + '''}''',
+	 # ‹...›
      }
 
 .. note:: If you want to make use of the Ti\ *k*\ Z externalization library for
    the LaTeX build output, then you may want to change the line::
 
      LATEXOPTS =
-     
+
    in ``/usr/share/sphinx/texinputs/Makefile`` to::
 
      LATEXOPTS = "-shell-escape"
@@ -180,38 +221,39 @@ The ``‹caption›`` is optional, but if present it is printed as a picture cap
 below the picture.
 
 The ``:libs:`` option expects its argument ``‹tikz libraries›`` to be a comma
-separated list of tikz libraries to use.  If you want to build the LaTeX target
-then make sure that you add these libraries to ``latex_preamble`` in
+separated list of Ti\ *k*\ z libraries to use.  If you want to build the LaTeX
+target then make sure that you add these libraries to the LaTeX preamble in
 ``conf.py``.
 
-The ``stringsubst`` option enables the following string substitution in the
-``‹tikz code›``.  Before processing the ``‹tikz code›`` the string ``$wd`` or
-``${wd}`` is replaced by the project root directory.  This is convenient when
+The ``:stringsubst:`` option enables the following string substitution in the
+``‹tikz code›``:  Before processing the ``‹tikz code›`` the string ``$wd`` or
+``$(wd)`` is replaced by the project root directory.  This is convenient when
 referring to some source file in the LaTeX code.
 
-The ``‹tikz code›`` is code according to the tikz LaTeX package.  It behaves as
-if inside a ``tikzpicture`` environment.
+The ``‹tikz code›`` is code according to the Ti\ *k*\ Z LaTeX package.  It
+behaves as if inside a ``tikzpicture`` environment.
+
+Alternatively to providing the ``‹tikz code›``, the ``:include:`` option can be
+used to import the code from a file::
+
+  .. tikz::‹caption, potentially broken
+     across lines›
+     :libs: ‹tikz libraries›
+     :include: ‹filename›
+     :stringsubst:
 
 The **tikz-role** is used as follows::
 
   :tikz:`‹tikz code›`
 
-The ``‹tikz code›`` is code according to the tikz LaTeX package.  It behaves as
-if inside a ``\tikz`` macro.  Ti\ *k*\ Z options can be given at the start of
-the ``‹tikz code›``.
-
-Additionaly, the ``:include:`` option can be used to import an entire tikzpicture::
-
-  .. tikz::‹caption, potentially broken
-     across lines›
-     :libs: ‹tikz libraries›
-     :include: <filename>
+The ``‹tikz code›`` is code according to the Ti\ *k*\ z LaTeX package.  It
+behaves as if inside a ``\tikz`` macro.
 
 Examples
 ========
 
 .. note:: These examples only render in a Sphinx project with a proper
-	  configuration of the Ti\ *k*\ z Sphinx extension.
+   configuration of the Ti\ *k*\ z Sphinx extension.
 
 ::
 
@@ -238,35 +280,17 @@ Examples
 
 ::
 
-  An example role :tikz:`[thick] \node[draw] (a) {A}; 
+  An example role :tikz:`[thick] \node[blue,draw] (a) {A};
   \node[draw,dotted,right of=a] {B} edge[<-] (a);`
 
 
-An example role :tikz:`[thick] \node[draw] (a) {A}; \node[draw,dotted,right
+An example role :tikz:`[blue,thick] \node[draw] (a) {A}; \node[draw,dotted,right
 of=a] {B} edge[<-] (a);`
 
 Example of a plot imported from a file:
 
-.. tikz:: 
-  :libs: arrows
-  :include: NewGM-Armijo2.tikz
-
-An example of use of `tikz_tikzlibraries` and `tikz_latex_preamble` options (by `Dominik Haumann <http://www.texample.net/tikz/examples/double-arrows/>`_).
-
 .. tikz::
-
-      \node[draw,rectangle] (a) {A};
-      \node[inner sep=0,minimum size=0,right of=a] (k) {}; % invisible node
-      \node[draw,rectangle,right of=k] (b) {B};
-      \node[draw,rectangle,below of=a] (c) {C};
-
-      % 1st pass: draw arrows
-      \draw[vecArrow] (a) to (b);
-      \draw[vecArrow] (k) |- (c);
-
-      % 2nd pass: copy all from 1st pass, and replace vecArrow with innerWhite
-      \draw[innerWhite] (a) to (b);
-      \draw[innerWhite] (k) |- (c);
+   :include: example2.tikz
 
 Caveats
 =======

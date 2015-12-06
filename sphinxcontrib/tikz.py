@@ -31,12 +31,12 @@
     sphinxcontrib.tikz
     ~~~~~~~~~~~~~~~~~~
 
-    Draw pictures with the `TikZ/PGF LaTeX package.
+    Draw pictures with the TikZ/PGF LaTeX package.
 
     See README.rst file for details
 
     Author: Christoph Reller <christoph.reller@gmail.com>
-    Version: 0.4.1
+    Version: 0.4.2
 """
 
 import contextlib
@@ -46,10 +46,11 @@ import shutil
 import sys
 import codecs
 import os
+import re
 
-from os import path, getcwd, chdir, mkdir
+from os import path, getcwd, chdir
 from string import Template
-from subprocess import Popen, PIPE, call
+from subprocess import Popen, PIPE
 try:
     from hashlib import sha1 as sha
 except ImportError:
@@ -60,15 +61,16 @@ from docutils.parsers.rst import directives
 
 from sphinx.errors import SphinxError
 try:
-    from sphinx.util.osutil import ensuredir, ENOENT, EPIPE
+    from sphinx.util.osutil import ensuredir, ENOENT
 except:
-    from sphinx.util import ensuredir, ENOENT, EPIPE
+    from sphinx.util import ensuredir, ENOENT
 
 from sphinx.util.compat import Directive
 
 _Win_ = sys.platform[0:3] == 'win'
 
 # TODO: Check existence of executables with subprocess.check_call
+
 
 @contextlib.contextmanager
 def changedir(directory):
@@ -100,31 +102,39 @@ def system(command, builder, outfile=None):
     if process.returncode != 0:
         builder._tikz_warned = True
         raise TikzExtError('Error (tikz extension): %s exited with error:'
-                           '\n[stderr]\n%s\n[stdout]\n%s' % (binary, stderr, stdout))
+                           '\n[stderr]\n%s\n[stdout]\n%s'
+                           % (binary, stderr, stdout))
     if outfile is not None:
         f = open(outfile, 'wb')
         f.write(stdout)
         f.close()
 
+
 class TikzExtError(SphinxError):
     category = 'Tikz extension error'
 
+
 class tikzinline(nodes.Inline, nodes.Element):
     pass
+
 
 def tikz_role(role, rawtext, text, lineno, inliner, option={}, content=[]):
     tikz = utils.unescape(text, restore_backslashes=True)
     return [tikzinline(tikz=tikz)], []
 
+
 class tikz(nodes.Part, nodes.Element):
     pass
+
 
 class TikzDirective(Directive):
     has_content = True
     required_arguments = 0
     optional_arguments = 1
     final_argument_whitespace = True
-    option_spec = {'libs':directives.unchanged,'stringsubst':directives.flag, 'include':directives.unchanged}
+    option_spec = {'libs': directives.unchanged,
+                   'stringsubst': directives.flag,
+                   'include': directives.unchanged}
 
     def run(self):
         node = tikz()
@@ -189,10 +199,24 @@ OUT_EXTENSION = {
     'pdf2svg': 'svg',
     }
 
-def render_tikz(self,node,libs='',stringsubst=False):
+
+def cleanup_tikzcode(self, node):
     tikz = node['tikz']
+    tikz = tikz.replace('\r\n', '\n')
+    tikz = re.sub('^\s*%.*$\n', '', tikz, 0, re.MULTILINE)
+    tikz = re.sub('^\s*$\n', '', tikz, 0, re.MULTILINE)
+    if not tikz.startswith('\\begin{tikzpicture}'):
+        tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
+    if 'stringsubst' in node:
+        tikz = Template(tikz).safe_substitute(wd=getcwd().replace('\\', '/'))
+    return tikz
+
+
+def render_tikz(self, node, libs='', stringsubst=False):
+    tikz = cleanup_tikzcode(self, node)
     hashkey = tikz.encode('utf-8')
-    fname = 'tikz-%s.%s' % (sha(hashkey).hexdigest(), OUT_EXTENSION[self.builder.config.tikz_proc_suite])
+    fname = 'tikz-%s.%s' % (sha(hashkey).hexdigest(),
+                            OUT_EXTENSION[self.builder.config.tikz_proc_suite])
     relfn = posixpath.join(self.builder.imgpath, fname)
     outfn = path.join(self.builder.outdir, '_images', fname)
 
@@ -206,10 +230,6 @@ def render_tikz(self,node,libs='',stringsubst=False):
 
     latex = DOC_HEAD % libs
     latex += self.builder.config.tikz_latex_preamble
-    if stringsubst:
-        tikz = Template(tikz).substitute(wd=getcwd().replace('\\','/'))
-    if 'include' not in node:
-        tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
     latex += DOC_BODY % tikz
     latex = latex.encode('utf-8')
 
@@ -219,35 +239,38 @@ def render_tikz(self,node,libs='',stringsubst=False):
         tf.write(latex)
         tf.close()
 
-        system(['pdflatex', '--interaction=nonstopmode', 'tikz.tex'], self.builder)
+        system(['pdflatex', '--interaction=nonstopmode', 'tikz.tex'],
+               self.builder)
 
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
-            system(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf', 'tikz'], self.builder)
+            system(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf',
+                    'tikz'], self.builder)
 
             if self.builder.config.tikz_proc_suite == "ImageMagick":
                 if self.builder.config.tikz_transparent:
                     convert_args = ['-fuzz', '2%', '-transparent', 'white']
                 else:
                     convert_args = []
-                system(['convert', '-trim'] +  convert_args + ['tikz.ppm', outfn], self.builder)
+                system(['convert', '-trim'] + convert_args +
+                       ['tikz.ppm', outfn], self.builder)
 
             elif self.builder.config.tikz_proc_suite == "Netpbm":
                 if self.builder.config.tikz_transparent:
                     pnm_args = ['-transparent', 'rgb:ff/ff/ff']
                 else:
                     pnm_args = []
-                system(['pnmtopng'] + pnm_args + ["tikz.ppm"], self.builder, outfile=outfn)
+                system(['pnmtopng'] + pnm_args + ["tikz.ppm"], self.builder,
+                       outfile=outfn)
 
         elif self.builder.config.tikz_proc_suite == "GhostScript":
             if self.builder.config.tikz_transparent:
                 device = "pngalpha"
             else:
                 device = "png256"
-            if _Win_:
-                system(['gswin64c', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r120x120', '-f', 'tikz.pdf'], self.builder)
-            else:
-                system(['ghostscript', '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn, '-r120x120', '-f', 'tikz.pdf'], self.builder)
+            system(['ghostscript', '-dBATCH', '-dNOPAUSE',
+                    '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn,
+                    '-r120x120', '-f', 'tikz.pdf'], self.builder)
         elif self.builder.config.tikz_proc_suite == "pdf2svg":
             system(['pdf2svg', 'tikz.pdf', outfn], self.builder)
         else:
@@ -255,14 +278,14 @@ def render_tikz(self,node,libs='',stringsubst=False):
             raise TikzExtError('Error (tikz extension): Invalid configuration '
                                'value for tikz_proc_suite')
 
-
         return relfn
 
-def html_visit_tikzinline(self,node):
+
+def html_visit_tikzinline(self, node):
     libs = self.builder.config.tikz_tikzlibraries
     libs = libs.replace(' ', '').replace('\t', '').strip(', ')
     try:
-        fname = render_tikz(self,node,libs);
+        fname = render_tikz(self, node, libs)
     except TikzExtError as exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
@@ -279,12 +302,12 @@ def html_visit_tikzinline(self,node):
                          (fname, self.encode(node['tikz']).strip()))
         raise nodes.SkipNode
 
-def html_visit_tikz(self,node):
+
+def html_visit_tikz(self, node):
     libs = self.builder.config.tikz_tikzlibraries + ',' + node['libs']
     libs = libs.replace(' ', '').replace('\t', '').strip(', ')
-
     try:
-        fname = render_tikz(self,node,libs,node['stringsubst'])
+        fname = render_tikz(self, node, libs, node['stringsubst'])
     except TikzExtError as exc:
         info = str(exc)[str(exc).find('!'):-1]
         sm = nodes.system_message(info, type='WARNING', level=2,
@@ -307,10 +330,11 @@ def html_visit_tikz(self,node):
         self.body.append('</div>')
         raise nodes.SkipNode
 
+
 def latex_visit_tikzinline(self, node):
     tikz = node['tikz']
     if tikz[0] == '[':
-        cnt,pos = 1,1
+        cnt, pos = 1, 1
         while cnt > 0 and cnt < len(tikz):
             if tikz[pos] == '[':
                 cnt = cnt + 1
@@ -323,28 +347,21 @@ def latex_visit_tikzinline(self, node):
     self.body.append('\\tikz' + tikz + '}')
     raise nodes.SkipNode
 
-def latex_visit_tikz(self, node):
-    if 'include' in node:
-        begTikzPic = ''
-        endTikzPic = ''
-        node['tikz']=node['tikz'].replace('\r\n','\n')
-    else:
-        begTikzPic = '\\begin{tikzpicture}'
-        endTikzPic = '\\end{tikzpicture}'
 
+def latex_visit_tikz(self, node):
+    tikz = cleanup_tikzcode(self, node)
     if node['caption']:
-        if node['stringsubst']:
-            node['tikz'] = node['tikz'] % {'wd': getcwd()}
-        latex = '\\begin{figure}[htp]\\centering' + begTikzPic + \
-                node['tikz'] + endTikzPic + '\\caption{' + \
-                self.encode(node['caption']).strip() + '}\\end{figure}'
+        latex = '\\begin{figure}[htp]\\centering' + tikz \
+                + '\\caption{' + self.encode(node['caption']).strip() \
+                + '}\\end{figure}'
     else:
-        latex = '\\begin{center}' + begTikzPic + node['tikz'] + \
-            endTikzPic + '\\end{center}'
+        latex = '\\begin{center}' + tikz + '\\end{center}'
     self.body.append(latex)
 
-def depart_tikz(self,node):
+
+def depart_tikz(self, node):
     pass
+
 
 def cleanup_tempdir(app, exc):
     if exc:
@@ -356,22 +373,28 @@ def cleanup_tempdir(app, exc):
     except Exception:
         pass
 
+
 def builder_inited(app):
     app.builder._tikz_tempdir = tempfile.mkdtemp()
 
     if app.builder.name == "latex":
-        sty_path = os.path.join(app.builder._tikz_tempdir, "sphinxcontribtikz.sty")
+        sty_path = os.path.join(app.builder._tikz_tempdir,
+                                "sphinxcontribtikz.sty")
         sty = open(sty_path, mode="w")
         sty.write(r"\RequirePackage{tikz}" + "\n")
         sty.write(r"\RequirePackage{amsmath}" + "\n")
         sty.write(r"\RequirePackage{amsfonts}" + "\n")
         sty.write(r"\RequirePackage{pgfplots}" + "\n")
         sty.write(app.builder.config.tikz_latex_preamble + "\n")
-        sty.write(r"\usetikzlibrary{%s}" % app.builder.config.tikz_tikzlibraries.replace(' ', '').replace('\t', '').strip(', ') + "\n")
+        tikzlibs = app.builder.config.tikz_tikzlibraries
+        tikzlibs = tikzlibs.replace(' ', '')
+        tikzlibs = tikzlibs.replace('\t', '')
+        tikzlibs = tikzlibs.strip(', ') + "\n"
+        sty.write(r"\usetikzlibrary{%s}" % tikzlibs)
         sty.close()
 
         app.builder.config.latex_additional_files.append(sty_path)
-        app.add_latex_package("sphinxcontribtikz")
+
 
 def setup(app):
     app.add_node(tikz,
