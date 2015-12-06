@@ -290,7 +290,7 @@ of=a] {B} edge[<-] (a);`
 Example of a plot imported from a file:
 
 .. tikz::
-   :include: example2.tikz
+   :include: example.tikz
 
 Caveats
 =======
