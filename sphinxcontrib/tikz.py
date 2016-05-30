@@ -428,6 +428,16 @@ def setup(app):
     app.add_config_value('tikz_latex_preamble', '', 'html')
     app.add_config_value('tikz_tikzlibraries', '', 'html')
     app.add_config_value('tikz_transparent', True, 'html')
-    app.add_config_value('tikz_proc_suite', 'Netpbm', 'html')
+
+    # fallback to another value depending what is on the system
+    suite = 'pdf2svg'
+    if not which('pdf2svg'):
+        suite = 'GhostScript'
+        if not which('ghostscript'):
+            suite = 'ImageMagick'
+            if not which('pnmcrop'):
+                suite = 'Netpbm'
+    app.add_config_value('tikz_proc_suite', suite, 'html')
+
     app.connect('build-finished', cleanup_tempdir)
     app.connect('builder-inited', builder_inited)
