@@ -396,6 +396,26 @@ def builder_inited(app):
         app.builder.config.latex_additional_files.append(sty_path)
 
 
+def which(program):
+    if sys.platform == "win32" and not program.endswith(".exe"):
+        program += ".exe"
+
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for p in os.environ["PATH"].split(os.pathsep):
+            p = p.strip('"')
+            exe_file = os.path.join(p, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
+
 def setup(app):
     app.add_node(tikz,
                  html=(html_visit_tikz, depart_tikz),
