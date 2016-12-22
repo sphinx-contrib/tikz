@@ -18,7 +18,6 @@ without further notice.
 :Version: 0.4.2
 :Author: Christoph Reller ``christoph.reller@gmail.com``
 :License: `BSD License <http://opensource.org/licenses/bsd-license.html>`__
-:Download: `tikz.py <http://reller.nightcolours.ch/web/_static/tikz.py>`__
 :Git Repository: https://bitbucket.org/philexander/tikz
 :PyPI Package: http://pypi.python.org/pypi/sphinxcontrib-tikz
 
@@ -30,16 +29,26 @@ Prerequisites
 
 This extension relies on two software packages being installed on your computer:
 
-A. LaTeX with the ``tikz`` package.
+* ``latex`` with the ``tikz`` and the ``amsmath`` packages
+* one of:
+    * ``pdftoppm`` (part of the Poppler pdf library) and  ``pnmtopng`` (part of the Netpbm package);
+    * ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of the ImageMagick package);
+    * ``ghostscript``;
+    * ``pdf2svg``.
 
 B. A software package that is able to convert a PDF to an image.  Currently,
    this extension supports four different ways of doing this conversion.  We
    call them conversion "suites" and list for each suite what must be installed
    on your computer: (Only one such suite need be installed.)
 
-   The Netpbm suite
-      ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of
-      the ImageMagick package)
+* ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
+* one of (depending on the suite — see below):
+    * ``poppler-utils`` and ``netpbm`` (for the ``Netpbm`` suite);
+    * ``imagemagick``   and ``netpbm`` (for the ``ImageMagick`` suite);
+    * ``ghostscript`` (for the ``GhostScript`` suite);
+    * ``pdf2svg`` (for the ``pdf2svg`` suite).
+
+For **Mac OS X** a possible way of getting this extension working is:
 
    The pdf2svg suite
       ``pdf2svg``
