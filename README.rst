@@ -30,35 +30,17 @@ Prerequisites
 This extension relies on two software packages being installed on your computer:
 
 * ``latex`` with the ``tikz`` and the ``amsmath`` packages
-* one of:
+* A software package that is able to convert a PDF to an image.  Currently,
+  this extension supports four different ways of doing this conversion.  We
+  call them conversion "suites" and list for each suite what must be installed
+  on your computer: (Only one such suite need be installed.)
     * ``pdftoppm`` (part of the Poppler pdf library) and  ``pnmtopng`` (part of the Netpbm package);
     * ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of the ImageMagick package);
     * ``ghostscript``;
     * ``pdf2svg``.
 
-B. A software package that is able to convert a PDF to an image.  Currently,
-   this extension supports four different ways of doing this conversion.  We
-   call them conversion "suites" and list for each suite what must be installed
-   on your computer: (Only one such suite need be installed.)
-
-* ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
-* one of (depending on the suite — see below):
-    * ``poppler-utils`` and ``netpbm`` (for the ``Netpbm`` suite);
-    * ``imagemagick``   and ``netpbm`` (for the ``ImageMagick`` suite);
-    * ``ghostscript`` (for the ``GhostScript`` suite);
-    * ``pdf2svg`` (for the ``pdf2svg`` suite).
-
-For **Mac OS X** a possible way of getting this extension working is:
-
-   The pdf2svg suite
-      ``pdf2svg``
-
-   The GhostScript suite
-      ``ghostscript``
-
-   The ImageMagick suite
-      ``pdftoppm`` (part of the Poppler pdf library) and ``pnmtopng`` (part of
-      the Netpbm package)
+Ubuntu Linux
+------------
 
 For **Ubuntu Linux** you roughly have to make sure that the following packages
 are installed:
@@ -73,11 +55,27 @@ B. Depending on the chosen conversion suite the following package(s) have to be
    * GhostScript suite: ``ghostscript``
    * ImageMagick suite: ``poppler-utils`` and ``imagemagick``
 
+Mac OS X
+--------
+
 For **Mac OS X** a possible way of getting this extension working is to install
 the `MacTeX <http://tug.org/mactex/>`__ LaTeX distribution which per default comes
 with the ``tikz`` package.  To install one of the conversion suites you can
 install `homebrew <http://mxcl.github.com/homebrew/>`__ and then use homebrew to
-install the package(s) listed under B. as above for Ubuntu Linux.
+install the package(s) listed under B. as above for Ubuntu Linux, that is:
+
+* The pdf2svg suite
+  ``pdf2svg``
+
+* The GhostScript suite
+  ``ghostscript``
+
+* The ImageMagick suite
+  ``pdftoppm`` (part of the Poppler pdf library) and ``pnmtopng`` (part of
+  the Netpbm package)
+
+Windows
+-------
 
 For **Windows** do the following:
 
