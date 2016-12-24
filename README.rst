@@ -21,6 +21,7 @@ without further notice.
 :Download: `tikz.py <http://reller.nightcolours.ch/web/_static/tikz.py>`__
 :Git Repository: https://bitbucket.org/philexander/tikz
 :PyPI Package: http://pypi.python.org/pypi/sphinxcontrib-tikz
+:Documentation: http://sphinxcontrib-tikz.readthedocs.io
 
 Prerequisites and Configuration
 ===============================
