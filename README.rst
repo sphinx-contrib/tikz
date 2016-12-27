@@ -15,7 +15,7 @@ without further notice.
 
 ----
 
-:Version: 0.4.2
+:Version: 0.4.3
 :Author: Christoph Reller ``christoph.reller@gmail.com``
 :License: `BSD License <http://opensource.org/licenses/bsd-license.html>`__
 :Download: `tikz.py <http://reller.nightcolours.ch/web/_static/tikz.py>`__

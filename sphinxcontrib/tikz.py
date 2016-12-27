@@ -36,7 +36,7 @@
     See README.rst file for details
 
     Author: Christoph Reller <christoph.reller@gmail.com>
-    Version: 0.4.2
+    Version: 0.4.3
 """
 
 import contextlib
