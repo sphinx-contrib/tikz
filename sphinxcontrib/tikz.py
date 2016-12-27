@@ -77,8 +77,10 @@ def changedir(directory):
     """Context to temporary change directory"""
     curdir = getcwd()
     chdir(directory)
-    yield
-    chdir(curdir)
+    try:
+        yield
+    finally:
+        chdir(curdir)
 
 
 def system(command, builder, outfile=None):
