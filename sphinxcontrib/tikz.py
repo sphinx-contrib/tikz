@@ -36,7 +36,7 @@
     See README.rst file for details
 
     Author: Christoph Reller <christoph.reller@gmail.com>
-    Version: 0.4.2
+    Version: 0.4.3
 """
 
 import contextlib
@@ -77,8 +77,10 @@ def changedir(directory):
     """Context to temporary change directory"""
     curdir = getcwd()
     chdir(directory)
-    yield
-    chdir(curdir)
+    try:
+        yield
+    finally:
+        chdir(curdir)
 
 
 def system(command, builder, outfile=None):
