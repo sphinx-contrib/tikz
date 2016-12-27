@@ -177,10 +177,9 @@ class TikzDirective(Directive):
         return [node]
 
 DOC_HEAD = r'''
-\documentclass[12pt,preview,tikz]{standalone}
+\documentclass[12pt,tikz]{standalone}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
-\usepackage{tikz}
 \usepackage{pgfplots}
 \usetikzlibrary{%s}
 \pagestyle{empty}
@@ -415,6 +414,7 @@ def which(program):
                 return exe_file
 
     return None
+
 
 def setup(app):
     app.add_node(tikz,
