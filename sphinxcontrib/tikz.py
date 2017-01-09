@@ -245,7 +245,7 @@ def render_tikz(self, node, libs='', stringsubst=False):
 
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
-            system(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf',
+            system(['pdftoppm', '-r', '400', '-singlefile', 'tikz.pdf',
                     'tikz'], self.builder)
 
             if self.builder.config.tikz_proc_suite == "ImageMagick":
