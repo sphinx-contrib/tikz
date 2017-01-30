@@ -67,6 +67,8 @@ except:
 
 from sphinx.util.compat import Directive
 
+from glob import glob
+
 _Win_ = sys.platform[0:3] == 'win'
 
 # TODO: Check existence of executables with subprocess.check_call
@@ -241,28 +243,32 @@ def render_tikz(self, node, libs='', stringsubst=False):
         tf.write(latex)
         tf.close()
 
-        system(['pdflatex', '--interaction=nonstopmode', 'tikz.tex'],
+        system([self.builder.config.latex_engine, '--interaction=nonstopmode', 'tikz.tex'],
                self.builder)
 
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
-            system(['pdftoppm', '-r', '120', '-singlefile', 'tikz.pdf',
+            system(['pdftoppm', '-r', '120', 'tikz.pdf',
                     'tikz'], self.builder)
+            #in Windows 'pdf2ppm -singlefile' does not work
+            #therefore do without it and glob instead
+            ppmfilename = glob('tikz*.ppm')[0]
 
             if self.builder.config.tikz_proc_suite == "ImageMagick":
                 if self.builder.config.tikz_transparent:
                     convert_args = ['-fuzz', '2%', '-transparent', 'white']
                 else:
                     convert_args = []
+
                 system(['convert', '-trim'] + convert_args +
-                       ['tikz.ppm', outfn], self.builder)
+                       [ppmfilename, outfn], self.builder)
 
             elif self.builder.config.tikz_proc_suite == "Netpbm":
                 if self.builder.config.tikz_transparent:
                     pnm_args = ['-transparent', 'rgb:ff/ff/ff']
                 else:
                     pnm_args = []
-                system(['pnmtopng'] + pnm_args + ["tikz.ppm"], self.builder,
+                system(['pnmtopng'] + pnm_args + [ppmfilename], self.builder,
                        outfile=outfn)
 
         elif self.builder.config.tikz_proc_suite == "GhostScript":
