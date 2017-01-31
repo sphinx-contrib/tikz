@@ -248,7 +248,7 @@ def render_tikz(self, node, libs='', stringsubst=False):
 
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
-            system(['pdftoppm', '-r', '120', 'tikz.pdf',
+            system(['pdftoppm', '-r', '400', 'tikz.pdf',
                     'tikz'], self.builder)
             #in Windows 'pdf2ppm -singlefile' does not work
             #therefore do without it and glob instead
