@@ -272,11 +272,12 @@ def render_tikz(self, node, libs='', stringsubst=False):
                        outfile=outfn)
 
         elif self.builder.config.tikz_proc_suite == "GhostScript":
+            ghostscript = which('ghostscript') or which('gs') or which('gswin64')
             if self.builder.config.tikz_transparent:
                 device = "pngalpha"
             else:
                 device = "png256"
-            system(['ghostscript', '-dBATCH', '-dNOPAUSE',
+            system([ghostscript, '-dBATCH', '-dNOPAUSE',
                     '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn,
                     '-r120x120', '-f', 'tikz.pdf'], self.builder)
         elif self.builder.config.tikz_proc_suite == "pdf2svg":
@@ -441,7 +442,7 @@ def setup(app):
     suite = 'pdf2svg'
     if not which('pdf2svg'):
         suite = 'GhostScript'
-        if not which('ghostscript'):
+        if not (which('ghostscript') or which('gs') or which('gswin64')):
             suite = 'ImageMagick'
             if not which('pnmcrop'):
                 suite = 'Netpbm'
