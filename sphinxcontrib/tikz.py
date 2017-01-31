@@ -94,7 +94,7 @@ def system(command, builder, outfile=None):
     """
     binary = command[0]
     try:
-        process = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
+        process = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE, env={'PATH': os.getenv('PATH')})
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
             raise
