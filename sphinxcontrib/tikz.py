@@ -94,7 +94,7 @@ def system(command, builder, outfile=None):
     """
     binary = command[0]
     try:
-        process = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE, env={'PATH': os.getenv('PATH')})
+        process = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
             raise
@@ -182,7 +182,6 @@ class TikzDirective(Directive):
 
 DOC_HEAD = r'''
 \documentclass[12pt,preview,tikz]{standalone}
-\usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{tikz}
 \usepackage{pgfplots}
@@ -260,7 +259,7 @@ def render_tikz(self, node, libs='', stringsubst=False):
                 else:
                     convert_args = []
 
-                system(['convert', '-trim'] + convert_args +
+                system([which('convert'), '-trim'] + convert_args +
                        [ppmfilename, outfn], self.builder)
 
             elif self.builder.config.tikz_proc_suite == "Netpbm":
