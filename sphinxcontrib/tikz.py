@@ -67,6 +67,8 @@ except:
 
 from sphinx.util.compat import Directive
 
+from glob import glob
+
 _Win_ = sys.platform[0:3] == 'win'
 
 # TODO: Check existence of executables with subprocess.check_call
@@ -166,7 +168,7 @@ class TikzDirective(Directive):
             else:
                 node['tikz'] = '\n'.join(self.content)
                 node['caption'] = '\n'.join(self.arguments)
-        
+
         node['libs'] = self.options.get('libs', '')
         if 'stringsubst' in self.options:
             node['stringsubst'] = True
@@ -240,36 +242,40 @@ def render_tikz(self, node, libs='', stringsubst=False):
         tf.write(latex)
         tf.close()
 
-        system(['pdflatex', '--interaction=nonstopmode', 'tikz.tex'],
+        system([self.builder.config.latex_engine, '--interaction=nonstopmode',
+                'tikz.tex'],
                self.builder)
 
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
-            system(['pdftoppm', '-r', '400', '-singlefile', 'tikz.pdf',
+            system(['pdftoppm', '-r', '400', 'tikz.pdf',
                     'tikz'], self.builder)
+            ppmfilename = glob('tikz*.ppm')[0]
 
             if self.builder.config.tikz_proc_suite == "ImageMagick":
                 if self.builder.config.tikz_transparent:
                     convert_args = ['-fuzz', '2%', '-transparent', 'white']
                 else:
                     convert_args = []
-                system(['convert', '-trim'] + convert_args +
-                       ['tikz.ppm', outfn], self.builder)
+
+                system([which('convert'), '-trim'] + convert_args +
+                       [ppmfilename, outfn], self.builder)
 
             elif self.builder.config.tikz_proc_suite == "Netpbm":
                 if self.builder.config.tikz_transparent:
                     pnm_args = ['-transparent', 'rgb:ff/ff/ff']
                 else:
                     pnm_args = []
-                system(['pnmtopng'] + pnm_args + ["tikz.ppm"], self.builder,
+                system(['pnmtopng'] + pnm_args + [ppmfilename], self.builder,
                        outfile=outfn)
 
         elif self.builder.config.tikz_proc_suite == "GhostScript":
+            ghostscript = which('ghostscript') or which('gs') or which('gswin64')
             if self.builder.config.tikz_transparent:
                 device = "pngalpha"
             else:
                 device = "png256"
-            system(['ghostscript', '-dBATCH', '-dNOPAUSE',
+            system([ghostscript, '-dBATCH', '-dNOPAUSE',
                     '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn,
                     '-r120x120', '-f', 'tikz.pdf'], self.builder)
         elif self.builder.config.tikz_proc_suite == "pdf2svg":
@@ -435,7 +441,7 @@ def setup(app):
     suite = 'pdf2svg'
     if not which('pdf2svg'):
         suite = 'GhostScript'
-        if not which('ghostscript'):
+        if not (which('ghostscript') or which('gs') or which('gswin64')):
             suite = 'ImageMagick'
             if not which('pnmcrop'):
                 suite = 'Netpbm'

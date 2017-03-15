@@ -35,6 +35,7 @@ This extension relies on two software packages being installed on your computer:
   this extension supports four different ways of doing this conversion.  We
   call them conversion "suites" and list for each suite what must be installed
   on your computer: (Only one such suite need be installed.)
+
     * ``pdftoppm`` (part of the Poppler pdf library) and  ``pnmtopng`` (part of the Netpbm package);
     * ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of the ImageMagick package);
     * ``ghostscript``;
