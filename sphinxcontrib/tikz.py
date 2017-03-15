@@ -36,7 +36,7 @@
     See README.rst file for details
 
     Author: Christoph Reller <christoph.reller@gmail.com>
-    Version: 0.4.2
+    Version: 0.4.3
 """
 
 import contextlib
@@ -168,7 +168,7 @@ class TikzDirective(Directive):
             else:
                 node['tikz'] = '\n'.join(self.content)
                 node['caption'] = '\n'.join(self.arguments)
-        
+
         node['libs'] = self.options.get('libs', '')
         if 'stringsubst' in self.options:
             node['stringsubst'] = True
@@ -181,9 +181,9 @@ class TikzDirective(Directive):
         return [node]
 
 DOC_HEAD = r'''
-\documentclass[12pt,preview,tikz]{standalone}
+\documentclass[12pt,tikz]{standalone}
+\usepackage[utf8]{inputenc}
 \usepackage{amsmath}
-\usepackage{tikz}
 \usepackage{pgfplots}
 \usetikzlibrary{%s}
 \pagestyle{empty}
@@ -242,15 +242,14 @@ def render_tikz(self, node, libs='', stringsubst=False):
         tf.write(latex)
         tf.close()
 
-        system([self.builder.config.latex_engine, '--interaction=nonstopmode', 'tikz.tex'],
+        system([self.builder.config.latex_engine, '--interaction=nonstopmode',
+                'tikz.tex'],
                self.builder)
 
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
             system(['pdftoppm', '-r', '400', 'tikz.pdf',
                     'tikz'], self.builder)
-            #in Windows 'pdf2ppm -singlefile' does not work
-            #therefore do without it and glob instead
             ppmfilename = glob('tikz*.ppm')[0]
 
             if self.builder.config.tikz_proc_suite == "ImageMagick":
@@ -423,6 +422,7 @@ def which(program):
                 return exe_file
 
     return None
+
 
 def setup(app):
     app.add_node(tikz,
