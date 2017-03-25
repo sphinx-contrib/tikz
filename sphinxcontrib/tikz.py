@@ -401,6 +401,7 @@ def builder_inited(app):
         sty.close()
 
         app.builder.config.latex_additional_files.append(sty_path)
+        app.add_latex_package("sphinxcontribtikz")
 
 
 def which(program):
