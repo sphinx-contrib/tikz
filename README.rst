@@ -2,11 +2,11 @@
 Description of the Ti\ *k*\ Z Sphinx Extension
 ==============================================
 
-This extension to `Sphinx <http://sphinx.pocoo.org/>`__ enables the use of the
+This extension to `Sphinx <http://www.sphinx-doc.org>`__ enables the use of the
 PGF/Ti\ *k*\ Z LaTeX package to draw nice pictures.  (See `CTAN
 <http://www.ctan.org/tex-archive/graphics/pgf/>`__ or `sourceforge
 <http://sourceforge.net/projects/pgf/>`__; the manual is, e.g., `here
-<http://www.ctan.org/tex-archive/graphics/pgf/base/doc/generic/pgf/pgfmanual.pdf>`__.
+<http://mirrors.ctan.org/graphics/pgf/base/doc/pgfmanual.pdf>`__.
 Also have a look at contributions such as `pgfplots
 <http://www.ctan.org/tex-archive/graphics/pgf/contrib/pgfplots/>`__.)
 
@@ -30,16 +30,18 @@ Prerequisites
 
 This extension relies on two software packages being installed on your computer:
 
-* ``latex`` with the ``tikz`` and the ``amsmath`` packages
-* A software package that is able to convert a PDF to an image.  Currently,
-  this extension supports four different ways of doing this conversion.  We
-  call them conversion "suites" and list for each suite what must be installed
-  on your computer: (Only one such suite need be installed.)
+A. ``latex`` with the ``tikz`` and the ``amsmath`` packages
+B. A software package that is able to convert a PDF to an image.  Currently,
+   this extension supports four different ways of doing this conversion.  We
+   call them conversion "suites" and list for each suite what must be installed
+   on your computer: (Only one such suite need be installed.)
 
-    * ``pdftoppm`` (part of the Poppler pdf library) and  ``pnmtopng`` (part of the Netpbm package);
-    * ``pdftoppm`` (part of the Poppler pdf library) and ``convert`` (part of the ImageMagick package);
-    * ``ghostscript``;
-    * ``pdf2svg``.
+   * pdf2svg suite: ``pdf2svg``
+   * Netpbm suite: ``pdftoppm`` (part of the Poppler pdf library) and ``pnmtopng``
+     (part of the Netpbm package)
+   * ImageMagick suite: ``pdftoppm`` (part of the Poppler pdf library) and
+     ``convert`` (part of the ImageMagick package)
+   * GhostScript suite: ``ghostscript``
 
 Ubuntu Linux
 ------------
@@ -52,29 +54,22 @@ A. ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
 B. Depending on the chosen conversion suite the following package(s) have to be
    installed:
 
-   * Netpbm suite: ``poppler-utils`` and ``netpbm``
    * pdf2svg suite: ``pdf2svg``
-   * GhostScript suite: ``ghostscript``
+   * Netpbm suite: ``poppler-utils`` and ``netpbm``
    * ImageMagick suite: ``poppler-utils`` and ``imagemagick``
+   * GhostScript suite: ``ghostscript``
 
 Mac OS X
 --------
 
-For **Mac OS X** a possible way of getting this extension working is to install
-the `MacTeX <http://tug.org/mactex/>`__ LaTeX distribution which per default comes
-with the ``tikz`` package.  To install one of the conversion suites you can
-install `homebrew <http://mxcl.github.com/homebrew/>`__ and then use homebrew to
-install the package(s) listed under B. as above for Ubuntu Linux, that is:
+For **Mac OS X** a possible way of getting this extension working is as follows:
 
-* The pdf2svg suite
-  ``pdf2svg``
+A. Install the `MacTeX <http://tug.org/mactex/>`__ LaTeX distribution which per
+   default comes with the ``tikz`` package.
 
-* The GhostScript suite
-  ``ghostscript``
-
-* The ImageMagick suite
-  ``pdftoppm`` (part of the Poppler pdf library) and ``pnmtopng`` (part of
-  the Netpbm package)
+B. To install one of the conversion suites you can install `homebrew
+   <https://brew.sh/>`__ and then use homebrew to install the package(s) listed
+   under B. as above for Ubuntu Linux.
 
 Windows
 -------
@@ -86,11 +81,17 @@ A. Install the `MiKTeX <http://miktex.org/>`__ LaTeX distribution and include
 
 B. Depending on the chosen conversion suite, you have to install the following:
 
+   * pdf2svg suite:
+
+     Get the Windows binaries from `GitHub
+     <https://github.com/jalios/pdf2svg-windows>`__ copy all the files to some
+     directory and add this directory to the ``PATH`` environment variable.
+
    * Netpbm suite:
 
      - `Xpdf package <http://www.foolabs.com/xpdf/download.html>`__
      - `NetPbm for Windows package
-       <http://gnuwin32.sourceforge.net/packages/netpbm.HTML>`__
+       <http://gnuwin32.sourceforge.net/packages/netpbm.htm>`__
 
      If you don't want to install the full packages above, you can copy the
      following files to some directory and add this directory to the ``PATH``
@@ -108,28 +109,20 @@ B. Depending on the chosen conversion suite, you have to install the following:
      * ``rgb.txt``
 
      Also, you need to create a new environment variable
-     ``RGBDEF=C:\\TikzSphinx\\rgb.txt`` assuming you copy the files to the
-     ``C:\\TikzSphinx`` directory.
+     ``RGBDEF=C:\TikzSphinx\rgb.txt`` assuming you copy the files to the
+     ``C:\TikzSphinx`` directory.
 
-   * pdf2svg suite:
+   * ImageMagick suite:
 
-     Get the Windows binaries from `GitHub
-     <https://github.com/jalios/pdf2svg-windows>`__ copy all the files to some
-     directory and add this directory to the ``PATH`` environment variable.
+     Install the `Xpdf package <http://www.foolabs.com/xpdf/download.html>`__
+     (same as for the Netpbm suite) and install ImageMagick from `here
+     <http://www.imagemagick.org/script/binary-releases.php>`__.
 
    * GhostScript suite:
 
      Get the GhostScript binary from `here
-     <http://www.ghostscript.com/download/gsdnld.html>`__, rename the binary to
-     ``ghostscript.exe``, copy it to some directory and add this directory to
-     the ``PATH`` environment variable.  Instead of renaming the binary you can
-     also use ``mklink`` in a administrator command shell to make a link named
-     ``ghostscript.exe`` to the original binary.
-
-   * ImageMagick suite:
-
-     Install Xpdf (as described for the Netpbm suite) and install ImageMagick
-     from `here <http://www.imagemagick.org/script/binary-releases.php>`__.
+     <https://ghostscript.com/download/gsdnld.html>`__, copy it to some
+     directory and add this directory to the ``PATH`` environment variable.
 
 .. highlight:: python
 
@@ -138,17 +131,16 @@ B. Depending on the chosen conversion suite, you have to install the following:
 Configuration
 -------------
 
-If you have installed the Ti\ *k*\ z Sphinx extension e.g. using `PyPI
+If you have installed the Ti\ *k*\ z Sphinx extension e.g. using `PyPI
 <http://pypi.python.org/pypi/sphinxcontrib-tikz>`__, then you have to load the
 extension in the Sphinx project configuration file ``conf.py`` by::
 
   extensions = ['sphinxcontrib.tikz']
 
-Additionally, the following configuration values are supported for the ``html``
-build target:
+Additionally, the following configuration values are supported:
 
-* Choose the image processing ``‹suite›``, either ``'Netpbm'``, ``'pdf2svg'``,
-  ``'GhostScript'``, ``'ImageMagick'`` (``'Netpbm'`` by default)::
+* Choose the image processing ``‹suite›``, either ``'pdf2svg'``, ``'Netpbm'``,
+  ``'ImageMagick'``, ``'GhostScript'`` (``'pdf2svg'`` by default)::
 
     tikz_proc_suite = ‹suite›
 
@@ -172,30 +164,16 @@ build target:
 
     tikz_tikzlibraries = ‹string›
 
-.. note:: The above configuration values only apply to the ``html`` build
-   target.  If you want to use the ``latex`` target, then you have to take care
-   to include in the preamble for the ``latex`` target:
-
-   * The ``tikz_latex_preamble``
-   * The ``tikz_libraries``
-   * Any ``‹tikz libraries›`` given to the ``libs`` option of the ``tikz``
-     directive (see :ref:`usage`)
-
-   I recommend to do this as follows::
-
-     latex_elements = {
-         # ‹...›
-	 'preamble': '''\usepackage{tikz}''' + tikz_latex_preamble + '''
-	 \usetikzlibrary{''' + tikz_tikzlibraries + "‹tikz libraries›" + '''}''',
-	 # ‹...›
-     }
+.. note:: If you want to use the ``latex`` target, then you have to take care to
+   include in ``tikz_libraries`` any ``‹tikz libraries›`` given to the ``libs``
+   option of the ``tikz`` directive (see :ref:`usage`)
 
 .. note:: If you want to make use of the Ti\ *k*\ Z externalization library for
    the LaTeX build output, then you may want to change the line::
 
      LATEXOPTS =
 
-   in ``/usr/share/sphinx/texinputs/Makefile`` to::
+   in Sphinx LaTeX Makefile (``/usr/share/sphinx/texinputs/Makefile``) to::
 
      LATEXOPTS = "-shell-escape"
 
@@ -206,8 +184,7 @@ build target:
 Usage
 =====
 
-The extension adds a ``tikz``-directive and a ``tikz``-role.  The usage is very
-similar to the standard math Sphinx extensions.
+The extension adds a ``tikz``-directive and a ``tikz``-role.
 
 The **tikz-directive** can be used in two ways::
 
@@ -231,8 +208,8 @@ below the picture.
 
 The ``:libs:`` option expects its argument ``‹tikz libraries›`` to be a comma
 separated list of Ti\ *k*\ z libraries to use.  If you want to build the LaTeX
-target then make sure that you add these libraries to the LaTeX preamble in
-``conf.py``.
+target then make sure to add these libraries to the configuration value
+``tikz_tikzlibraries`` in ``conf.py``.
 
 The ``:stringsubst:`` option enables the following string substitution in the
 ``‹tikz code›``:  Before processing the ``‹tikz code›`` the string ``$wd`` or
@@ -240,7 +217,8 @@ The ``:stringsubst:`` option enables the following string substitution in the
 referring to some source file in the LaTeX code.
 
 The ``‹tikz code›`` is code according to the Ti\ *k*\ Z LaTeX package.  It
-behaves as if inside a ``tikzpicture`` environment.
+behaves as if inside a ``tikzpicture`` environment.  The presence of
+``\begin{tikzpicture}`` and ``\end{tikzpicture}`` is optional.
 
 Alternatively to providing the ``‹tikz code›``, the ``:include:`` option can be
 used to import the code from a file::
@@ -296,7 +274,7 @@ Examples
 An example role :tikz:`[blue,thick] \node[draw] (a) {A}; \node[draw,dotted,right
 of=a] {B} edge[<-] (a);`
 
-Example of a plot imported from a file:
+Example of a Ti\ *k*\ z picture included from a file:
 
 .. tikz::
    :include: example.tikz
@@ -310,6 +288,6 @@ This is because, as soon as you specify a caption, the ``tikzpicture``
 environment is set inside a ``figure`` environment and hence it is a float and
 cannot live inside a table or another float.
 
-If you enable ``:stringsubst:`` and you happen to have a math expression
+If you enable ``:stringsubst:`` and you happen to have any LaTeX math expression
 starting with ``wd`` (i.e., you would like to write ``$wd ...`` then you must
 insert some white space, e.g., ``$w d ...`` to prevent string substitution.
