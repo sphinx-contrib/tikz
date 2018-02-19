@@ -58,14 +58,13 @@ except ImportError:
 
 from docutils import nodes, utils
 from docutils.parsers.rst import directives
+from docutils.parsers.rst import Directive
 
 from sphinx.errors import SphinxError
 try:
     from sphinx.util.osutil import ensuredir, ENOENT
 except:
     from sphinx.util import ensuredir, ENOENT
-
-from sphinx.util.compat import Directive
 
 from glob import glob
 
