@@ -8,7 +8,7 @@ of the PGF/TikZ LaTeX package to draw nice pictures.
 
 NAME         = 'sphinxcontrib-tikz'
 DESCRIPTION  = 'TikZ extension for Sphinx'
-VERSION      = '0.4.4'
+VERSION      = '0.4.5'
 AUTHOR       = 'Christoph Reller'
 AUTHOR_EMAIL = 'christoph.reller@gmail.com'
 URL          = 'https://bitbucket.org/philexander/tikz'
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     extra = {}
     if sys.version_info >= (3,):
         extra['use_2to3'] = True
-    
+
     setup(
         name=NAME,
         version=VERSION,
