@@ -36,8 +36,9 @@
     See README.rst file for details
 
     Author: Christoph Reller <christoph.reller@gmail.com>
-    Version: 0.4.5
 """
+
+__version__ = '0.4.5'
 
 import contextlib
 import tempfile
@@ -57,8 +58,7 @@ except ImportError:
     from sha import sha
 
 from docutils import nodes, utils
-from docutils.parsers.rst import directives
-from docutils.parsers.rst import Directive
+from docutils.parsers.rst import Directive, directives
 
 from sphinx.errors import SphinxError
 try:
@@ -215,9 +215,10 @@ def cleanup_tikzcode(self, node):
 
 
 def render_tikz(self, node, libs='', stringsubst=False):
+    # must use unique filenames for all tmpfiles to support sphinx -j
     tikz = cleanup_tikzcode(self, node)
-    hashkey = tikz.encode('utf-8')
-    fname = 'tikz-%s.%s' % (sha(hashkey).hexdigest(),
+    shasum = sha(tikz.encode('utf-8')).hexdigest()
+    fname = 'tikz-%s.%s' % (shasum,
                             OUT_EXTENSION[self.builder.config.tikz_proc_suite])
     relfn = posixpath.join(self.builder.imgpath, fname)
     outfn = path.join(self.builder.outdir, '_images', fname)
@@ -237,19 +238,19 @@ def render_tikz(self, node, libs='', stringsubst=False):
 
     with changedir(self.builder._tikz_tempdir):
 
-        tf = open('tikz.tex', 'wb')
+        tf = open('tikz-%s.tex' % shasum, 'wb')
         tf.write(latex)
         tf.close()
 
         system([self.builder.config.latex_engine, '--interaction=nonstopmode',
-                'tikz.tex'],
+                'tikz-%s.tex' % shasum],
                self.builder)
 
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
-            system(['pdftoppm', '-r', '400', 'tikz.pdf',
-                    'tikz'], self.builder)
-            ppmfilename = glob('tikz*.ppm')[0]
+            system(['pdftoppm', '-r', '400', 'tikz-%s.pdf' % shasum,
+                    'tikz-%s' % shasum], self.builder)
+            ppmfilename = glob('tikz-%s*.ppm' % shasum)[0]
 
             if self.builder.config.tikz_proc_suite == "ImageMagick":
                 if self.builder.config.tikz_transparent:
@@ -276,9 +277,9 @@ def render_tikz(self, node, libs='', stringsubst=False):
                 device = "png256"
             system([ghostscript, '-dBATCH', '-dNOPAUSE',
                     '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn,
-                    '-r120x120', '-f', 'tikz.pdf'], self.builder)
+                    '-r120x120', '-f', 'tikz-%s.pdf' % shasum], self.builder)
         elif self.builder.config.tikz_proc_suite == "pdf2svg":
-            system(['pdf2svg', 'tikz.pdf', outfn], self.builder)
+            system(['pdf2svg', 'tikz-%s.pdf' % shasum, outfn], self.builder)
         else:
             self.builder._tikz_warned = True
             raise TikzExtError('Error (tikz extension): Invalid configuration '
@@ -449,3 +450,9 @@ def setup(app):
 
     app.connect('build-finished', cleanup_tempdir)
     app.connect('builder-inited', builder_inited)
+
+    return {
+        'version': __version__,
+        'parallel_read_safe': True,
+        'parallel_write_safe': True
+    }
