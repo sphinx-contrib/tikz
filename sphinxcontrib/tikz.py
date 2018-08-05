@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2012-2015 by Christoph Reller. All rights reserved.
+# Copyright (c) 2012-2018 by Christoph Reller. All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -38,7 +38,7 @@
     Author: Christoph Reller <christoph.reller@gmail.com>
 """
 
-__version__ = '0.4.5'
+__version__ = '0.4.6'
 
 import contextlib
 import tempfile
