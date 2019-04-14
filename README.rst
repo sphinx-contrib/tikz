@@ -150,6 +150,11 @@ Additionally, the following configuration values are supported:
     have to choose ``GhostScript``.
   * All suites produce png images, excepted ``'pdf2svg'`` which produces svg.
 
+* Choose an image resolution (ignored if ``tikz_proc_suite`` is ``'pdf2svg'``,
+  default ``184``)::
+
+    tikz_resolution = ‹number›
+
 * Enable/disable transparent graphics (enabled by default)::
 
     tikz_transparent = ‹True or False›

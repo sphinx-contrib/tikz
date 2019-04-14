@@ -246,10 +246,12 @@ def render_tikz(self, node, libs='', stringsubst=False):
                 'tikz-%s.tex' % shasum],
                self.builder)
 
+        resolution = str(self.builder.config.tikz_resolution)
+
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
-            system(['pdftoppm', '-r', '400', 'tikz-%s.pdf' % shasum,
-                    'tikz-%s' % shasum], self.builder)
+            system(['pdftoppm', '-r', resolution, 'tikz-%s.pdf' % shasum, 'tikz-%s' %
+                    shasum], self.builder)
             ppmfilename = glob('tikz-%s*.ppm' % shasum)[0]
 
             if self.builder.config.tikz_proc_suite == "ImageMagick":
@@ -275,9 +277,9 @@ def render_tikz(self, node, libs='', stringsubst=False):
                 device = "pngalpha"
             else:
                 device = "png256"
-            system([ghostscript, '-dBATCH', '-dNOPAUSE',
-                    '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn,
-                    '-r120x120', '-f', 'tikz-%s.pdf' % shasum], self.builder)
+            system([ghostscript, '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device,
+                    '-sOutputFile=%s' % outfn, '-r' + resolution + 'x' + resolution,
+                    '-f', 'tikz-%s.pdf' % shasum], self.builder)
         elif self.builder.config.tikz_proc_suite == "pdf2svg":
             system(['pdf2svg', 'tikz-%s.pdf' % shasum, outfn], self.builder)
         else:
@@ -447,6 +449,7 @@ def setup(app):
             if not which('pnmcrop'):
                 suite = 'Netpbm'
     app.add_config_value('tikz_proc_suite', suite, 'html')
+    app.add_config_value('tikz_resolution', 184, 'html')
 
     app.connect('build-finished', cleanup_tempdir)
     app.connect('builder-inited', builder_inited)
