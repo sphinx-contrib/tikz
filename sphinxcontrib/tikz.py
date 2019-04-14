@@ -304,10 +304,10 @@ def html_visit_tikzinline(self, node):
         raise nodes.SkipNode
     if fname is None:
         # something failed -- use text-only as a bad substitute
-        self.body.append('<span class="math">%s</span>' %
+        self.body.append('<span class="pre">%s</span>' %
                          self.encode(node['tikz']).strip())
     else:
-        self.body.append('<img class="math" src="%s" alt="%s"/>' %
+        self.body.append('<img src="%s" alt="%s"/>' %
                          (fname, self.encode(node['tikz']).strip()))
         raise nodes.SkipNode
 
@@ -326,7 +326,7 @@ def html_visit_tikz(self, node):
         raise nodes.SkipNode
     if fname is None:
         # something failed -- use text-only as a bad substitute
-        self.body.append('<span class="math">%s</span>' %
+        self.body.append('<span class="pre">%s</span>' %
                          self.encode(node['tikz']).strip())
     else:
         self.body.append(self.starttag(node, 'div', CLASS='figure'))
