@@ -141,6 +141,7 @@ class TikzDirective(Directive):
 
     def run(self):
         node = tikz()
+        captionstr = ''
 
         if 'include' in self.options:
             node['include'] = self.options['include']
@@ -157,16 +158,14 @@ class TikzDirective(Directive):
                 return [self.state.document.reporter.warning(
                     'External Tikz file %r not found or reading '
                     'it failed' % filename, line=self.lineno)]
-            node['caption'] = ''
             if self.arguments:
-                node['caption'] = '\n'.join(self.arguments)
+                captionstr = '\n'.join(self.arguments)
         else:
             if not self.content:
-                node['caption'] = ''
                 node['tikz'] = '\n'.join(self.arguments)
             else:
                 node['tikz'] = '\n'.join(self.content)
-                node['caption'] = '\n'.join(self.arguments)
+                captionstr = '\n'.join(self.arguments)
 
         node['libs'] = self.options.get('libs', '')
         if 'stringsubst' in self.options:
@@ -177,6 +176,11 @@ class TikzDirective(Directive):
             return [self.state_machine.reporter.warning(
                     'Ignoring "tikz" directive without content.',
                     line=self.lineno)]
+
+        # If we have a caption, add it as a child node.
+        if captionstr:
+            node += nodes.caption(captionstr, '', nodes.Text(captionstr))
+
         return [node]
 
 DOC_HEAD = r'''
@@ -323,7 +327,6 @@ def html_visit_tikz(self, node):
                                   backrefs=[], source=node['tikz'])
         sm.walkabout(self)
         self.builder.warn('display latex %r: \n' % node['tikz'] + str(exc))
-        raise nodes.SkipNode
     if fname is None:
         # something failed -- use text-only as a bad substitute
         self.body.append('<span class="pre">%s</span>' %
@@ -333,11 +336,10 @@ def html_visit_tikz(self, node):
         self.body.append('<p>')
         self.body.append('<img src="%s" alt="%s" /></p>\n' %
                          (fname, self.encode(node['tikz']).strip()))
-        if node['caption']:
-            self.body.append('<p class="caption">%s</p>' %
-                             self.encode(node['caption']).strip())
-        self.body.append('</div>')
-        raise nodes.SkipNode
+
+
+def html_depart_tikz(self, node):
+    self.body.append('</div>')
 
 
 def latex_visit_tikzinline(self, node):
@@ -359,16 +361,25 @@ def latex_visit_tikzinline(self, node):
 
 def latex_visit_tikz(self, node):
     tikz = cleanup_tikzcode(self, node)
-    if node['caption']:
-        latex = '\\begin{figure}[htp]\\centering' + tikz \
-                + '\\caption{' + self.encode(node['caption']).strip() \
-                + '}\\end{figure}'
+
+    # Have a caption: enclose in a figure environment.
+    if any(isinstance(child, nodes.caption) for child in node.children):
+        self.body.append('\\begin{figure}[htp]\\centering' + tikz)
+
+    # No caption: place in a center environment.
     else:
-        latex = '\\begin{center}' + tikz + '\\end{center}'
-    self.body.append(latex)
+        self.body.append('\\begin{center}' + tikz + '\\end{center}')
 
 
-def depart_tikz(self, node):
+def latex_depart_tikz(self, node):
+    # If we have a caption, we need to add a label for any cross-referencing
+    # and then close the figure environment.
+    if any(isinstance(child, nodes.caption) for child in node.children):
+        self.body.append(self.hypertarget_to(node))
+        self.body.append('\\end{figure}')
+
+
+def depart_tikzinline(self, node):
     pass
 
 
@@ -428,12 +439,12 @@ def which(program):
 
 
 def setup(app):
-    app.add_node(tikz,
-                 html=(html_visit_tikz, depart_tikz),
-                 latex=(latex_visit_tikz, depart_tikz))
+    app.add_enumerable_node(tikz, 'figure',
+                 html=(html_visit_tikz, html_depart_tikz),
+                 latex=(latex_visit_tikz, latex_depart_tikz))
     app.add_node(tikzinline,
-                 html=(html_visit_tikzinline, depart_tikz),
-                 latex=(latex_visit_tikzinline, depart_tikz))
+                 html=(html_visit_tikzinline, depart_tikzinline),
+                 latex=(latex_visit_tikzinline, depart_tikzinline))
     app.add_role('tikz', tikz_role)
     app.add_directive('tikz', TikzDirective)
     app.add_config_value('tikz_latex_preamble', '', 'html')
