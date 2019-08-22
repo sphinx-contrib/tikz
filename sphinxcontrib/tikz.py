@@ -364,7 +364,7 @@ def latex_visit_tikz(self, node):
 
     # Have a caption: enclose in a figure environment.
     if any(isinstance(child, nodes.caption) for child in node.children):
-        self.body.append('\\begin{figure}[htp]\\centering' + tikz)
+        self.body.append('\\begin{figure}[htp]\\centering\\capstart' + tikz)
 
     # No caption: place in a center environment.
     else:
