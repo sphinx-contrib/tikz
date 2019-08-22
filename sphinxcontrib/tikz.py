@@ -97,10 +97,7 @@ def system(command, builder, outfile=None):
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
             raise
-        builder.warn('%s command cannot be run' % binary)
-        builder.warn(err)
-        builder._tikz_warned = True
-        return None
+        raise TikzExtError('!%s command cannot be run' % binary)
     stdout, stderr = process.communicate()
     if process.returncode != 0:
         builder._tikz_warned = True
@@ -300,20 +297,14 @@ def html_visit_tikzinline(self, node):
     try:
         fname = render_tikz(self, node, libs)
     except TikzExtError as exc:
-        info = str(exc)[str(exc).find('!'):-1]
+        info = str(exc)[str(exc).find('!'):].replace('\\n', '\n')
         sm = nodes.system_message(info, type='WARNING', level=2,
                                   backrefs=[], source=node['tikz'])
         sm.walkabout(self)
-        self.builder.warn('display latex %r: \n' % node['tikz'] + str(exc))
-        raise nodes.SkipNode
-    if fname is None:
-        # something failed -- use text-only as a bad substitute
-        self.body.append('<span class="pre">%s</span>' %
-                         self.encode(node['tikz']).strip())
     else:
         self.body.append('<img src="%s" alt="%s"/>' %
                          (fname, self.encode(node['tikz']).strip()))
-        raise nodes.SkipNode
+    raise nodes.SkipNode
 
 
 def html_visit_tikz(self, node):
@@ -322,15 +313,10 @@ def html_visit_tikz(self, node):
     try:
         fname = render_tikz(self, node, libs, node['stringsubst'])
     except TikzExtError as exc:
-        info = str(exc)[str(exc).find('!'):-1]
+        info = str(exc)[str(exc).find('!'):].replace('\\n', '\n')
         sm = nodes.system_message(info, type='WARNING', level=2,
                                   backrefs=[], source=node['tikz'])
         sm.walkabout(self)
-        self.builder.warn('display latex %r: \n' % node['tikz'] + str(exc))
-    if fname is None:
-        # something failed -- use text-only as a bad substitute
-        self.body.append('<span class="pre">%s</span>' %
-                         self.encode(node['tikz']).strip())
     else:
         self.body.append(self.starttag(node, 'div', CLASS='figure'))
         self.body.append('<p>')
