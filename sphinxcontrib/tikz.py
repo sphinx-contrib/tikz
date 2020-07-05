@@ -391,12 +391,12 @@ def builder_inited(app):
         sty.write(r"\RequirePackage{amsmath}" + "\n")
         sty.write(r"\RequirePackage{amsfonts}" + "\n")
         sty.write(r"\RequirePackage{pgfplots}" + "\n")
-        sty.write(app.builder.config.tikz_latex_preamble + "\n")
         tikzlibs = app.builder.config.tikz_tikzlibraries
         tikzlibs = tikzlibs.replace(' ', '')
         tikzlibs = tikzlibs.replace('\t', '')
         tikzlibs = tikzlibs.strip(', ') + "\n"
         sty.write(r"\usetikzlibrary{%s}" % tikzlibs)
+        sty.write(app.builder.config.tikz_latex_preamble + "\n")
         sty.close()
 
         app.builder.config.latex_additional_files.append(sty_path)
