@@ -8,7 +8,7 @@ of the PGF/TikZ LaTeX package to draw nice pictures.
 
 NAME         = 'sphinxcontrib-tikz'
 DESCRIPTION  = 'TikZ extension for Sphinx'
-VERSION      = '0.4.8'
+VERSION      = '0.4.9'
 AUTHOR       = 'Christoph Reller'
 AUTHOR_EMAIL = 'christoph.reller@gmail.com'
 URL          = 'https://bitbucket.org/philexander/tikz'
