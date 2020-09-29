@@ -348,9 +348,13 @@ def latex_visit_tikzinline(self, node):
 def latex_visit_tikz(self, node):
     tikz = cleanup_tikzcode(self, node)
 
+    align = self.elements['figure_align']
+    if self.no_latex_floats:
+        align = "H"
+
     # Have a caption: enclose in a figure environment.
     if any(isinstance(child, nodes.caption) for child in node.children):
-        self.body.append('\\begin{figure}[htp]\\centering\\capstart' + tikz)
+        self.body.append('\\begin{figure}[%s]\\centering\\capstart' % align + tikz)
 
     # No caption: place in a center environment.
     else:
