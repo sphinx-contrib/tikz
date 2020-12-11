@@ -195,14 +195,16 @@ The **tikz-directive** can be used in two ways::
 
   .. tikz:: ‹tikz code, potentially broken
      across lines›
-     :libs: ‹tikz libraries›
+     :libs:   ‹tikz libraries›
+     :xscale: ‹integer value between 0 and 100›
      :stringsubst:
 
 or::
 
   .. tikz:: ‹caption, potentially broken
      across lines›
-     :libs: ‹tikz libraries›
+     :libs:   ‹tikz libraries›
+     :xscale: ‹integer value between 0 and 100›
      :stringsubst:
 
      ‹tikz code, potentially broken
@@ -214,6 +216,14 @@ below the picture.
 The ``:libs:`` option expects its argument ``‹tikz libraries›`` to be a comma
 separated list of Ti\ *k*\ z libraries to use.  If you want to build the LaTeX
 target then make sure to add these libraries to the configuration value
+
+The ``:xscale:`` option expects its argument ``‹integer value between 0 and 100›``
+a percentage that determines the scaling factor relative to the content width.
+For the ``latex`` target, this is ``\columnwidth``, and for the ``html`` target,
+the percentage is added to the generated ``<\img>`` as a ``width`` attribute.
+The aspect ratio of the image is preserved.
+
+
 ``tikz_tikzlibraries`` in ``conf.py``.
 
 The ``:stringsubst:`` option enables the following string substitution in the
@@ -230,8 +240,9 @@ used to import the code from a file::
 
   .. tikz::‹caption, potentially broken
      across lines›
-     :libs: ‹tikz libraries›
+     :libs:    ‹tikz libraries›
      :include: ‹filename›
+     :xscale:  ‹integer value between 0 and 100›
      :stringsubst:
 
 The **tikz-role** is used as follows::

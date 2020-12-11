@@ -134,6 +134,7 @@ class TikzDirective(Directive):
     final_argument_whitespace = True
     option_spec = {'libs': directives.unchanged,
                    'stringsubst': directives.flag,
+                   'xscale': directives.unchanged,
                    'include': directives.unchanged}
 
     def run(self):
@@ -165,6 +166,7 @@ class TikzDirective(Directive):
                 captionstr = '\n'.join(self.arguments)
 
         node['libs'] = self.options.get('libs', '')
+        node['xscale'] = self.options.get('xscale', '')
         if 'stringsubst' in self.options:
             node['stringsubst'] = True
         else:
@@ -318,10 +320,14 @@ def html_visit_tikz(self, node):
                                   backrefs=[], source=node['tikz'])
         sm.walkabout(self)
     else:
+        # If scaling option is set, add 'width' attribute
+        scale = ''
+        if node['xscale']:
+            scale = 'width="%s%%"' % (node['xscale'])
         self.body.append(self.starttag(node, 'div', CLASS='figure'))
         self.body.append('<p>')
-        self.body.append('<img src="%s" alt="%s" /></p>\n' %
-                         (fname, self.encode(node['tikz']).strip()))
+        self.body.append('<img %s src="%s" alt="%s" /></p>\n' %
+                          (scale, fname, self.encode(node['tikz']).strip()))
 
 
 def html_depart_tikz(self, node):
@@ -348,6 +354,17 @@ def latex_visit_tikzinline(self, node):
 def latex_visit_tikz(self, node):
     tikz = cleanup_tikzcode(self, node)
 
+    # If scaling option is set, enclose in resizebox
+    scale_start = r""
+    scale_end   = r""
+    scale = 0
+    if node['xscale']:
+        scale = int(node['xscale']) * 0.01
+        scale_start= r"\resizebox{" + str(scale) + r"\columnwidth}{!}{"
+        scale_end  = r"}"
+
+    tikz = scale_start + tikz + scale_end
+
     # Have a caption: enclose in a figure environment.
     if any(isinstance(child, nodes.caption) for child in node.children):
         self.body.append('\\begin{figure}[htp]\\centering\\capstart' + tikz)
@@ -356,13 +373,14 @@ def latex_visit_tikz(self, node):
     else:
         self.body.append('\\begin{center}' + tikz + '\\end{center}')
 
-
 def latex_depart_tikz(self, node):
     # If we have a caption, we need to add a label for any cross-referencing
     # and then close the figure environment.
     if any(isinstance(child, nodes.caption) for child in node.children):
         self.body.append(self.hypertarget_to(node))
-        self.body.append('\\end{figure}')
+        self.body.append(
+            '\\end{figure}'
+        )
 
 
 def depart_tikzinline(self, node):
