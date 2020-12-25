@@ -223,7 +223,8 @@ referring to some source file in the LaTeX code.
 
 The ``‹tikz code›`` is code according to the Ti\ *k*\ Z LaTeX package.  It
 behaves as if inside a ``tikzpicture`` environment.  The presence of
-``\begin{tikzpicture}`` and ``\end{tikzpicture}`` is optional.
+``\begin{tikzpicture}`` and ``\end{tikzpicture}``, or any other environment starting
+with ``tikz...`` is optional.
 
 Alternatively to providing the ``‹tikz code›``, the ``:include:`` option can be
 used to import the code from a file::
