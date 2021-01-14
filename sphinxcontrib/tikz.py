@@ -133,6 +133,8 @@ class TikzDirective(Directive):
     optional_arguments = 1
     final_argument_whitespace = True
     option_spec = {'libs': directives.unchanged,
+                   'alt': directives.unchanged,
+                   'align': directives.unchanged,
                    'stringsubst': directives.flag,
                    'include': directives.unchanged}
 
@@ -165,6 +167,8 @@ class TikzDirective(Directive):
                 captionstr = '\n'.join(self.arguments)
 
         node['libs'] = self.options.get('libs', '')
+        node['alt'] = self.options.get('alt', 'This is a figure.')
+        node['align'] = self.options.get('align', 'center')
         if 'stringsubst' in self.options:
             node['stringsubst'] = True
         else:
@@ -303,7 +307,7 @@ def html_visit_tikzinline(self, node):
         sm.walkabout(self)
     else:
         self.body.append('<img src="%s" alt="%s"/>' %
-                         (fname, self.encode(node['tikz']).strip()))
+                         (fname, self.encode(node['alt']).strip()))
     raise nodes.SkipNode
 
 
@@ -318,10 +322,10 @@ def html_visit_tikz(self, node):
                                   backrefs=[], source=node['tikz'])
         sm.walkabout(self)
     else:
-        self.body.append(self.starttag(node, 'div', CLASS='figure'))
+        self.body.append(self.starttag(node, 'div', CLASS='figure', STYLE='text-align: %s' % self.encode(node['align']).strip()))
         self.body.append('<p>')
         self.body.append('<img src="%s" alt="%s" /></p>\n' %
-                         (fname, self.encode(node['tikz']).strip()))
+                         (fname, self.encode(node['alt']).strip()))
 
 
 def html_depart_tikz(self, node):
