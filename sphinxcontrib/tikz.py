@@ -167,7 +167,7 @@ class TikzDirective(Directive):
                 captionstr = '\n'.join(self.arguments)
 
         node['libs'] = self.options.get('libs', '')
-        node['alt'] = self.options.get('alt', 'This is a figure.')
+        node['alt'] = self.options.get('alt', 'Figure made with TikZ')
         node['align'] = self.options.get('align', 'center')
         if 'stringsubst' in self.options:
             node['stringsubst'] = True
@@ -204,6 +204,18 @@ OUT_EXTENSION = {
     'ImageMagick': 'png',
     'Netpbm': 'png',
     'pdf2svg': 'svg',
+    }
+
+LATEX_ALIGN = {
+    'center': 'centering',
+    'left': 'raggedright',
+    'right': 'raggedleft',
+    }
+
+LATEX_ALIGN_ENV = {
+    'center': 'center',
+    'left': 'flushleft',
+    'right': 'flushright',
     }
 
 
@@ -306,8 +318,7 @@ def html_visit_tikzinline(self, node):
                                   backrefs=[], source=node['tikz'])
         sm.walkabout(self)
     else:
-        self.body.append('<img src="%s" alt="%s"/>' %
-                         (fname, self.encode(node['alt']).strip()))
+        self.body.append('<img src="%s"/>' % fname)
     raise nodes.SkipNode
 
 
@@ -358,11 +369,13 @@ def latex_visit_tikz(self, node):
 
     # Have a caption: enclose in a figure environment.
     if any(isinstance(child, nodes.caption) for child in node.children):
-        self.body.append('\\begin{figure}[%s]\\centering\\capstart' % align + tikz)
+        self.body.append('\\begin{figure}[%s]\\%s\\capstart' %
+                         (align, LATEX_ALIGN[node['align']]) + tikz)
 
     # No caption: place in a center environment.
     else:
-        self.body.append('\\begin{center}' + tikz + '\\end{center}')
+        env = LATEX_ALIGN_ENV[node['align']]
+        self.body.append('\\begin{%s}' % env + tikz + '\\end{%s}' % env)
 
 
 def latex_depart_tikz(self, node):

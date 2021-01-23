@@ -197,8 +197,8 @@ The **tikz-directive** can be used in two ways::
      across lines›
      :libs: ‹tikz libraries›
      :stringsubst:
-     :align: <left|center|right>
-     :alt: <alternative text>
+     :align: ‹left|center|right›
+     :alt: ‹alternative text›
 
 or::
 
@@ -206,8 +206,8 @@ or::
      across lines›
      :libs: ‹tikz libraries›
      :stringsubst:
-     :align: <left|center|right>
-     :alt: <alternative text>
+     :align: ‹left|center|right›
+     :alt: ‹alternative text›
 
      ‹tikz code, potentially broken
      across lines›
@@ -225,9 +225,14 @@ The ``:stringsubst:`` option enables the following string substitution in the
 ``$(wd)`` is replaced by the project root directory.  This is convenient when
 referring to some source file in the LaTeX code.
 
-The ``:align:`` option expects "left", "center", or "right" to specify the horizontal alignment of the image, equivalent to the HTML "text-align" CSS property. The default value is "center".
+The ``:align:`` option expects ``left``, ``center``, or ``right`` to specify the
+horizontal alignment of the image, equivalent to the HTML "text-align" CSS
+property.  The default value is ``center``.
 
-The ``:alt:`` option specifies the alternative text, which is a short description of the image, displayed by applications that cannot display images, or spoken by applications for visually impaired users. The default value is "This is a figure."
+The ``:alt:`` option specifies the alternative text, which is a short description
+of the image, displayed by applications that cannot display images, or spoken by
+applications for visually impaired users. The default value is "Figure made with
+TikZ."
 
 The ``‹tikz code›`` is code according to the Ti\ *k*\ Z LaTeX package.  It
 behaves as if inside a ``tikzpicture`` environment.  The presence of
@@ -242,6 +247,8 @@ used to import the code from a file::
      :libs: ‹tikz libraries›
      :include: ‹filename›
      :stringsubst:
+     :align: ‹left|center|right›
+     :alt: ‹alternative text›
 
 The **tikz-role** is used as follows::
 
@@ -269,12 +276,14 @@ Examples
 
 ::
 
-  .. tikz:: An Example Directive with Caption
+  .. tikz:: An Example TikZ Directive with Caption
+     :align: left
 
      \draw[thick,rounded corners=8pt]
      (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
 
-.. tikz:: An Example Directive with Caption
+.. tikz:: An Example TikZ Directive with Caption
+   :align: left
 
    \draw[thick,rounded corners=8pt]
    (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
@@ -290,8 +299,15 @@ of=a] {B} edge[<-] (a);`
 
 Example of a Ti\ *k*\ z picture included from a file:
 
+::
+
+   .. tikz::
+      :include: example.tikz
+      :align: right
+
 .. tikz::
    :include: example.tikz
+   :align: right
 
 Caveats
 =======
