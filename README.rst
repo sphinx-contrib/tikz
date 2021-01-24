@@ -195,19 +195,21 @@ The **tikz-directive** can be used in two ways::
 
   .. tikz:: ‹tikz code, potentially broken
      across lines›
-     :libs: ‹tikz libraries›
+     :libs:   ‹tikz libraries›
+     :xscale: ‹integer value between 0 and 100›
      :stringsubst:
-     :align: ‹left|center|right›
-     :alt: ‹alternative text›
+     :align:  ‹left|center|right›
+     :alt:    ‹alternative text›
 
 or::
 
   .. tikz:: ‹caption, potentially broken
      across lines›
-     :libs: ‹tikz libraries›
+     :libs:   ‹tikz libraries›
+     :xscale: ‹integer value between 0 and 100›
      :stringsubst:
-     :align: ‹left|center|right›
-     :alt: ‹alternative text›
+     :align:  ‹left|center|right›
+     :alt:    ‹alternative text›
 
      ‹tikz code, potentially broken
      across lines›
@@ -219,6 +221,12 @@ The ``:libs:`` option expects its argument ``‹tikz libraries›`` to be a comm
 separated list of Ti\ *k*\ z libraries to use.  If you want to build the LaTeX
 target then make sure to add these libraries to the configuration value
 ``tikz_tikzlibraries`` in ``conf.py``.
+
+The ``:xscale:`` option expects its argument ``‹integer value between 0 and 100›``
+a percentage that determines the scaling factor relative to the content width.
+For the ``latex`` target, this is ``\columnwidth``, and for the ``html`` target,
+the percentage is added to the generated ``<\img>`` as a ``width`` attribute.
+The aspect ratio of the image is preserved.
 
 The ``:stringsubst:`` option enables the following string substitution in the
 ``‹tikz code›``:  Before processing the ``‹tikz code›`` the string ``$wd`` or
@@ -244,11 +252,12 @@ used to import the code from a file::
 
   .. tikz::‹caption, potentially broken
      across lines›
-     :libs: ‹tikz libraries›
+     :libs:    ‹tikz libraries›
      :include: ‹filename›
+     :xscale:  ‹integer value between 0 and 100›
      :stringsubst:
-     :align: ‹left|center|right›
-     :alt: ‹alternative text›
+     :align:   ‹left|center|right›
+     :alt:     ‹alternative text›
 
 The **tikz-role** is used as follows::
 

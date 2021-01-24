@@ -136,6 +136,7 @@ class TikzDirective(Directive):
                    'alt': directives.unchanged,
                    'align': directives.unchanged,
                    'stringsubst': directives.flag,
+                   'xscale': directives.unchanged,
                    'include': directives.unchanged}
 
     def run(self):
@@ -169,6 +170,7 @@ class TikzDirective(Directive):
         node['libs'] = self.options.get('libs', '')
         node['alt'] = self.options.get('alt', 'Figure made with TikZ')
         node['align'] = self.options.get('align', 'center')
+        node['xscale'] = self.options.get('xscale', '')
         if 'stringsubst' in self.options:
             node['stringsubst'] = True
         else:
@@ -333,10 +335,14 @@ def html_visit_tikz(self, node):
                                   backrefs=[], source=node['tikz'])
         sm.walkabout(self)
     else:
+        # If scaling option is set, add 'width' attribute
+        scale = ''
+        if node['xscale']:
+            scale = 'width="%s%%"' % (node['xscale'])
         self.body.append(self.starttag(node, 'div', CLASS='figure', STYLE='text-align: %s' % self.encode(node['align']).strip()))
         self.body.append('<p>')
-        self.body.append('<img src="%s" alt="%s" /></p>\n' %
-                         (fname, self.encode(node['alt']).strip()))
+        self.body.append('<img %s src="%s" alt="%s" /></p>\n' %
+                         (scale, fname, self.encode(node['alt']).strip()))
 
 
 def html_depart_tikz(self, node):
@@ -366,6 +372,16 @@ def latex_visit_tikz(self, node):
     align = self.elements['figure_align']
     if self.no_latex_floats:
         align = "H"
+
+    # If scaling option is set, enclose in resizebox
+    scale_start = r""
+    scale_end   = r""
+    scale = 0
+    if node['xscale']:
+        scale = int(node['xscale']) * 0.01
+        scale_start= r"\resizebox{" + str(scale) + r"\columnwidth}{!}{"
+        scale_end  = r"}"
+    tikz = scale_start + tikz + scale_end
 
     # Have a caption: enclose in a figure environment.
     if any(isinstance(child, nodes.caption) for child in node.children):
