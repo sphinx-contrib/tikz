@@ -191,6 +191,7 @@ DOC_HEAD = r'''
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{pgfplots}
+\usepackage{xeCJK}
 \usetikzlibrary{%s}
 \pagestyle{empty}
 '''
