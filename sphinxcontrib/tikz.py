@@ -59,6 +59,7 @@ except ImportError:
 
 from docutils import nodes, utils
 from docutils.parsers.rst import Directive, directives
+from docutils.statemachine import ViewList
 
 from sphinx.errors import SphinxError
 try:
@@ -182,7 +183,15 @@ class TikzDirective(Directive):
 
         # If we have a caption, add it as a child node.
         if captionstr:
-            node += nodes.caption(captionstr, '', nodes.Text(captionstr))
+            parsed = nodes.Element()
+            self.state.nested_parse(ViewList([captionstr], source=''),
+                                    self.content_offset, parsed)
+            first_node = parsed[0]
+            caption_node = nodes.caption(first_node.rawsource, '',
+                                         *first_node.children)
+            caption_node.source = first_node.source
+            caption_node.line = first_node.line
+            node += caption_node
 
         return [node]
 
