@@ -38,7 +38,7 @@
     Author: Christoph Reller <christoph.reller@gmail.com>
 """
 
-__version__ = '0.4.11'
+__version__ = '0.4.12'
 
 import contextlib
 import tempfile

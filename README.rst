@@ -15,7 +15,7 @@ without further notice.
 
 ----
 
-:Version: 0.4.11
+:Version: 0.4.12
 :Author: Christoph Reller ``christoph.reller@gmail.com``
 :License: `BSD License <http://opensource.org/licenses/bsd-license.html>`__
 :Git Repository: https://bitbucket.org/philexander/tikz
