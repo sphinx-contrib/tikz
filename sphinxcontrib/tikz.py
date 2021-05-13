@@ -49,6 +49,7 @@ import codecs
 import os
 import re
 
+from errno import ENOENT
 from os import path, getcwd, chdir
 from string import Template
 from subprocess import Popen, PIPE
@@ -63,9 +64,9 @@ from docutils.statemachine import ViewList
 
 from sphinx.errors import SphinxError
 try:
-    from sphinx.util.osutil import ensuredir, ENOENT
+    from sphinx.util.osutil import ensuredir
 except:
-    from sphinx.util import ensuredir, ENOENT
+    from sphinx.util import ensuredir
 
 from glob import glob
 
