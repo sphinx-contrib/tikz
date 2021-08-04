@@ -169,6 +169,11 @@ Additionally, the following configuration values are supported:
 
     tikz_tikzlibraries = ‹string›
 
+* Add path option for include image insert into tikz (see #10), when building html copy source/‹relative path› 
+  to tmp directory::
+
+    tikz_include_image = ‹relative path›
+
 .. note:: If you want to use the ``latex`` target, then you have to take care to
    include in ``tikz_libraries`` any ``‹tikz libraries›`` given to the ``libs``
    option of the ``tikz`` directive (see :ref:`usage`)

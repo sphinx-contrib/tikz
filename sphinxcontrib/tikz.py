@@ -430,6 +430,16 @@ def cleanup_tempdir(app, exc):
 def builder_inited(app):
     app.builder._tikz_tempdir = tempfile.mkdtemp()
 
+    src=app.srcdir+"/"+app.builder.config.tikz_include_image
+    desc=app.builder._tikz_tempdir+"/"+app.builder.config.tikz_include_image
+
+    if app.builder.config.tikz_include_image:
+        try:
+            shutil.copytree(src,desc)
+        except Exception:
+            pass
+
+
     if app.builder.name == "latex":
         sty_path = os.path.join(app.builder._tikz_tempdir,
                                 "sphinxcontribtikz.sty")
@@ -483,6 +493,7 @@ def setup(app):
     app.add_config_value('tikz_latex_preamble', '', 'html')
     app.add_config_value('tikz_tikzlibraries', '', 'html')
     app.add_config_value('tikz_transparent', True, 'html')
+    app.add_config_value('tikz_include_image', '', 'html')
 
     # fallback to another value depending what is on the system
     suite = 'pdf2svg'
