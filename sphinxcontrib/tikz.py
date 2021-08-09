@@ -275,6 +275,10 @@ def render_tikz(self, node, libs='', stringsubst=False):
                 'tikz-%s.tex' % shasum],
                self.builder)
 
+        system([self.builder.config.latex_engine, '--interaction=nonstopmode',
+                'tikz-%s.tex' % shasum],
+               self.builder)
+
         resolution = str(self.builder.config.tikz_resolution)
 
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
