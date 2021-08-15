@@ -16,12 +16,12 @@
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
 # EVENT SHALL CHRISTOPH RELLER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-# OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # The views and conclusions contained in the software and documentation are
 # those of the authors and should not be interpreted as representing official
@@ -65,7 +65,7 @@ from docutils.statemachine import ViewList
 from sphinx.errors import SphinxError
 try:
     from sphinx.util.osutil import ensuredir
-except:
+except ImportError:
     from sphinx.util import ensuredir
 
 from glob import glob
@@ -127,6 +127,41 @@ def tikz_role(role, rawtext, text, lineno, inliner, option={}, content=[]):
 
 class tikz(nodes.Part, nodes.Element):
     pass
+
+
+DOC_HEAD = r'''
+\documentclass[12pt,tikz]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{pgfplots}
+\usetikzlibrary{%s}
+\pagestyle{empty}
+'''
+
+DOC_BODY = r'''
+\begin{document}
+%s
+\end{document}
+'''
+
+OUT_EXTENSION = {
+    'GhostScript': 'png',
+    'ImageMagick': 'png',
+    'Netpbm': 'png',
+    'pdf2svg': 'svg',
+    }
+
+LATEX_ALIGN = {
+    'center': 'centering',
+    'left': 'raggedright',
+    'right': 'raggedleft',
+    }
+
+LATEX_ALIGN_ENV = {
+    'center': 'center',
+    'left': 'flushleft',
+    'right': 'flushright',
+    }
 
 
 class TikzDirective(Directive):
@@ -196,46 +231,12 @@ class TikzDirective(Directive):
 
         return [node]
 
-DOC_HEAD = r'''
-\documentclass[12pt,tikz]{standalone}
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-\usepackage{pgfplots}
-\usetikzlibrary{%s}
-\pagestyle{empty}
-'''
-
-DOC_BODY = r'''
-\begin{document}
-%s
-\end{document}
-'''
-
-OUT_EXTENSION = {
-    'GhostScript': 'png',
-    'ImageMagick': 'png',
-    'Netpbm': 'png',
-    'pdf2svg': 'svg',
-    }
-
-LATEX_ALIGN = {
-    'center': 'centering',
-    'left': 'raggedright',
-    'right': 'raggedleft',
-    }
-
-LATEX_ALIGN_ENV = {
-    'center': 'center',
-    'left': 'flushleft',
-    'right': 'flushright',
-    }
-
 
 def cleanup_tikzcode(self, node):
     tikz = node['tikz']
     tikz = tikz.replace('\r\n', '\n')
-    tikz = re.sub('^\s*%.*$\n', '', tikz, 0, re.MULTILINE)
-    tikz = re.sub('^\s*$\n', '', tikz, 0, re.MULTILINE)
+    tikz = re.sub(r'^\s*%.*$\n', '', tikz, 0, re.MULTILINE)
+    tikz = re.sub(r'^\s*$\n', '', tikz, 0, re.MULTILINE)
     if not tikz.startswith('\\begin{tikz'):
         tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
     if 'stringsubst' in node:
@@ -279,8 +280,8 @@ def render_tikz(self, node, libs='', stringsubst=False):
 
         if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
-            system(['pdftoppm', '-r', resolution, 'tikz-%s.pdf' % shasum, 'tikz-%s' %
-                    shasum], self.builder)
+            system(['pdftoppm', '-r', resolution, 'tikz-%s.pdf' % shasum,
+                    'tikz-%s' % shasum], self.builder)
             ppmfilename = glob('tikz-%s*.ppm' % shasum)[0]
 
             if self.builder.config.tikz_proc_suite == "ImageMagick":
@@ -301,13 +302,15 @@ def render_tikz(self, node, libs='', stringsubst=False):
                        outfile=outfn)
 
         elif self.builder.config.tikz_proc_suite == "GhostScript":
-            ghostscript = which('ghostscript') or which('gs') or which('gswin64')
+            ghostscript = which('ghostscript') or which('gs') or \
+                which('gswin64')
             if self.builder.config.tikz_transparent:
                 device = "pngalpha"
             else:
                 device = "png256"
-            system([ghostscript, '-dBATCH', '-dNOPAUSE', '-sDEVICE=%s' % device,
-                    '-sOutputFile=%s' % outfn, '-r' + resolution + 'x' + resolution,
+            system([ghostscript, '-dBATCH', '-dNOPAUSE',
+                    '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn,
+                    '-r' + resolution + 'x' + resolution,
                     '-f', 'tikz-%s.pdf' % shasum], self.builder)
         elif self.builder.config.tikz_proc_suite == "pdf2svg":
             system(['pdf2svg', 'tikz-%s.pdf' % shasum, outfn], self.builder)
@@ -349,7 +352,9 @@ def html_visit_tikz(self, node):
         scale = ''
         if node['xscale']:
             scale = 'width="%s%%"' % (node['xscale'])
-        self.body.append(self.starttag(node, 'div', CLASS='figure', STYLE='text-align: %s' % self.encode(node['align']).strip()))
+        style = 'text-align: %s' % self.encode(node['align'])
+        tag = self.starttag(node, 'div', CLASS='figure', STYLE=style)
+        self.body.append(tag.strip())
         self.body.append('<p>')
         self.body.append('<img %s src="%s" alt="%s" /></p>\n' %
                          (scale, fname, self.encode(node['alt']).strip()))
@@ -385,12 +390,12 @@ def latex_visit_tikz(self, node):
 
     # If scaling option is set, enclose in resizebox
     scale_start = r""
-    scale_end   = r""
+    scale_end = r""
     scale = 0
     if node['xscale']:
         scale = int(node['xscale']) * 0.01
-        scale_start= r"\resizebox{" + str(scale) + r"\columnwidth}{!}{"
-        scale_end  = r"}"
+        scale_start = r"\resizebox{" + str(scale) + r"\columnwidth}{!}{"
+        scale_end = r"}"
     tikz = scale_start + tikz + scale_end
 
     # Have a caption: enclose in a figure environment.
@@ -473,8 +478,8 @@ def which(program):
 
 def setup(app):
     app.add_enumerable_node(tikz, 'figure',
-                 html=(html_visit_tikz, html_depart_tikz),
-                 latex=(latex_visit_tikz, latex_depart_tikz))
+                            html=(html_visit_tikz, html_depart_tikz),
+                            latex=(latex_visit_tikz, latex_depart_tikz))
     app.add_node(tikzinline,
                  html=(html_visit_tikzinline, depart_tikzinline),
                  latex=(latex_visit_tikzinline, depart_tikzinline))
