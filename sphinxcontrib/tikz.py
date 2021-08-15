@@ -245,11 +245,11 @@ def cleanup_tikzcode(self, node):
 
 
 def render_tikz(self, node, libs='', stringsubst=False):
+    config = self.builder.config
     # must use unique filenames for all tmpfiles to support sphinx -j
     tikz = cleanup_tikzcode(self, node)
     shasum = sha(tikz.encode('utf-8')).hexdigest()
-    fname = 'tikz-%s.%s' % (shasum,
-                            OUT_EXTENSION[self.builder.config.tikz_proc_suite])
+    fname = 'tikz-%s.%s' % (shasum, OUT_EXTENSION[config.tikz_proc_suite])
     relfn = posixpath.join(self.builder.imgpath, fname)
     outfn = path.join(self.builder.outdir, '_images', fname)
 
@@ -262,7 +262,7 @@ def render_tikz(self, node, libs='', stringsubst=False):
     ensuredir(path.dirname(outfn))
 
     latex = DOC_HEAD % libs
-    latex += self.builder.config.tikz_latex_preamble
+    latex += config.tikz_latex_preamble
     latex += DOC_BODY % tikz
     latex = latex.encode('utf-8')
 
@@ -272,20 +272,20 @@ def render_tikz(self, node, libs='', stringsubst=False):
         tf.write(latex)
         tf.close()
 
-        system([self.builder.config.latex_engine, '--interaction=nonstopmode',
+        system([config.latex_engine, '--interaction=nonstopmode',
                 'tikz-%s.tex' % shasum],
                self.builder)
 
-        resolution = str(self.builder.config.tikz_resolution)
+        resolution = str(config.tikz_resolution)
 
-        if self.builder.config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
+        if config.tikz_proc_suite in ['ImageMagick', 'Netpbm']:
 
             system(['pdftoppm', '-r', resolution, 'tikz-%s.pdf' % shasum,
                     'tikz-%s' % shasum], self.builder)
             ppmfilename = glob('tikz-%s*.ppm' % shasum)[0]
 
-            if self.builder.config.tikz_proc_suite == "ImageMagick":
-                if self.builder.config.tikz_transparent:
+            if config.tikz_proc_suite == "ImageMagick":
+                if config.tikz_transparent:
                     convert_args = ['-fuzz', '2%', '-transparent', 'white']
                 else:
                     convert_args = []
@@ -293,18 +293,18 @@ def render_tikz(self, node, libs='', stringsubst=False):
                 system([which('convert'), '-trim'] + convert_args +
                        [ppmfilename, outfn], self.builder)
 
-            elif self.builder.config.tikz_proc_suite == "Netpbm":
-                if self.builder.config.tikz_transparent:
+            elif config.tikz_proc_suite == "Netpbm":
+                if config.tikz_transparent:
                     pnm_args = ['-transparent', 'rgb:ff/ff/ff']
                 else:
                     pnm_args = []
                 system(['pnmtopng'] + pnm_args + [ppmfilename], self.builder,
                        outfile=outfn)
 
-        elif self.builder.config.tikz_proc_suite == "GhostScript":
+        elif config.tikz_proc_suite == "GhostScript":
             ghostscript = which('ghostscript') or which('gs') or \
                 which('gswin64')
-            if self.builder.config.tikz_transparent:
+            if config.tikz_transparent:
                 device = "pngalpha"
             else:
                 device = "png256"
@@ -312,7 +312,7 @@ def render_tikz(self, node, libs='', stringsubst=False):
                     '-sDEVICE=%s' % device, '-sOutputFile=%s' % outfn,
                     '-r' + resolution + 'x' + resolution,
                     '-f', 'tikz-%s.pdf' % shasum], self.builder)
-        elif self.builder.config.tikz_proc_suite == "pdf2svg":
+        elif config.tikz_proc_suite == "pdf2svg":
             system(['pdf2svg', 'tikz-%s.pdf' % shasum, outfn], self.builder)
         else:
             self.builder._tikz_warned = True
