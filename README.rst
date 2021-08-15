@@ -144,11 +144,11 @@ Additionally, the following configuration values are supported:
 
     tikz_proc_suite = ‹suite›
 
-.. note::
+  .. note::
 
-  * If you want your documentation to be built on http://readthedocs.org, you
-    have to choose ``GhostScript``.
-  * All suites produce png images, excepted ``'pdf2svg'`` which produces svg.
+    * If you want your documentation to be built on http://readthedocs.org, you
+      have to choose ``GhostScript``.
+    * All suites produce png images, excepted ``'pdf2svg'`` which produces svg.
 
 * Choose an image resolution (ignored if ``tikz_proc_suite`` is ``'pdf2svg'``,
   default ``184``)::
@@ -164,14 +164,31 @@ Additionally, the following configuration values are supported:
 
     tikz_latex_preamble = ‹string›
 
+* To support ``\includegraphics{‹file›}`` within a Ti\ *k*\ Z picture, you have to
+  configure the directory path(s) where the ``‹file›``\ s reside by setting::
+
+    tikz_includegraphics_path = '‹relative path›'
+
+  or, for multiple directories::
+
+    tikz_includegraphics_path = ['‹relative path 1›', '‹relative path 2›, ...]
+
+  In the above, ``‹relative path›`` is a path relative to the root source directory.
+  Within a path, directories must be separated with ``/`` not ``\``.
+
+  .. note:: Internally, this option results in a ``\graphicspath{...}`` LaTeX
+     command, of which only one is permitted per LaTeX document.  If you use this
+     command in your ``tikz_latex_preamble`` or in ``latex_elements['preamble']``,
+     then don't set ``tikz_includegraphics_path``.
+
 * Add ``\usetikzlibrary{‹string›}`` to the LaTeX preamble used for building the
   Ti\ *k*\ Z picture::
 
     tikz_tikzlibraries = ‹string›
 
-.. note:: If you want to use the ``latex`` target, then you have to take care to
-   include in ``tikz_libraries`` any ``‹tikz libraries›`` given to the ``libs``
-   option of the ``tikz`` directive (see :ref:`usage`)
+  .. note:: If you want to use the ``latex`` target, then you have to take care to
+     include in ``tikz_libraries`` any ``‹tikz libraries›`` given to the ``libs``
+     option of the ``tikz`` directive (see :ref:`usage`)
 
 .. note:: If you want to make use of the Ti\ *k*\ Z externalization library for
    the LaTeX build output, then you may want to change the line::

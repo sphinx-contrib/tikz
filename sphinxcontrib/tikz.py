@@ -262,6 +262,7 @@ def render_tikz(self, node, libs='', stringsubst=False):
     ensuredir(path.dirname(outfn))
 
     latex = DOC_HEAD % libs
+    latex += self.builder._tikz_preamble
     latex += config.tikz_latex_preamble
     latex += DOC_BODY % tikz
     latex = latex.encode('utf-8')
@@ -434,6 +435,17 @@ def cleanup_tempdir(app, exc):
 
 def builder_inited(app):
     app.builder._tikz_tempdir = tempfile.mkdtemp()
+    app.builder._tikz_preamble = ''
+    extgfxpath = app.builder.config.tikz_includegraphics_path
+    if not extgfxpath == '':
+        if isinstance(extgfxpath, str):
+            extgfxpath = [extgfxpath]
+        app.builder._tikz_preamble = "\\graphicspath{"
+        for s in extgfxpath:
+            if s[-1] != "/":
+                s += "/"
+            app.builder._tikz_preamble += '{"%s/%s"}' % (app.srcdir, s)
+        app.builder._tikz_preamble += "}\n"
 
     if app.builder.name == "latex":
         sty_path = os.path.join(app.builder._tikz_tempdir,
@@ -446,8 +458,9 @@ def builder_inited(app):
         tikzlibs = app.builder.config.tikz_tikzlibraries
         tikzlibs = tikzlibs.replace(' ', '')
         tikzlibs = tikzlibs.replace('\t', '')
-        tikzlibs = tikzlibs.strip(', ') + "\n"
-        sty.write(r"\usetikzlibrary{%s}" % tikzlibs)
+        tikzlibs = tikzlibs.strip(', ')
+        sty.write("\\usetikzlibrary{%s}\n" % tikzlibs)
+        sty.write(app.builder._tikz_preamble)
         sty.write(app.builder.config.tikz_latex_preamble + "\n")
         sty.close()
 
@@ -485,9 +498,10 @@ def setup(app):
                  latex=(latex_visit_tikzinline, depart_tikzinline))
     app.add_role('tikz', tikz_role)
     app.add_directive('tikz', TikzDirective)
-    app.add_config_value('tikz_latex_preamble', '', 'html')
-    app.add_config_value('tikz_tikzlibraries', '', 'html')
+    app.add_config_value('tikz_latex_preamble', '', 'env')
+    app.add_config_value('tikz_tikzlibraries', '', 'env')
     app.add_config_value('tikz_transparent', True, 'html')
+    app.add_config_value('tikz_includegraphics_path', '', 'env')
 
     # fallback to another value depending what is on the system
     suite = 'pdf2svg'
