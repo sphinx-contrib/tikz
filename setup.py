@@ -23,10 +23,11 @@ CLASSIFIERS  = [
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
-    'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.4',
+    'Programming Language :: Python :: 3.6'
+    'Programming Language :: Python :: 3.7'
+    'Programming Language :: Python :: 3.8'
+    'Programming Language :: Python :: 3.9'
     'Topic :: Documentation',
     'Topic :: Utilities',
     ]
@@ -35,11 +36,6 @@ if __name__ == "__main__":
 
     from setuptools import setup, find_packages
     import sys
-
-    # Use 2to3 for Python 3 without warnings in Python 2
-    extra = {}
-    if sys.version_info >= (3,):
-        extra['use_2to3'] = True
 
     setup(
         name=NAME,
@@ -58,5 +54,4 @@ if __name__ == "__main__":
         include_package_data=True,
         install_requires=REQUIRES,
         namespace_packages=['sphinxcontrib'],
-        **extra
         )
