@@ -237,8 +237,11 @@ def cleanup_tikzcode(self, node):
     tikz = tikz.replace('\r\n', '\n')
     tikz = re.sub(r'^\s*%.*$\n', '', tikz, 0, re.MULTILINE)
     tikz = re.sub(r'^\s*$\n', '', tikz, 0, re.MULTILINE)
-    if not tikz.startswith('\\begin{tikz'):
-        tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
+    begin_tikz = '\\begin{tikz'
+    if not tikz.startswith(begin_tikz):
+        if begin_tikz not in tikz:
+            tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
+
     if 'stringsubst' in node:
         tikz = Template(tikz).safe_substitute(wd=getcwd().replace('\\', '/'))
     return tikz
