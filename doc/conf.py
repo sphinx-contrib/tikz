@@ -52,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'TikZ Sphinx Extension'
-copyright = '2010-2021, Christoph Reller'
+copyright = '2010-2022, Christoph Reller'
 author = 'Christoph Reller'
 
 # The version info for the project you're documenting, acts as replacement for
