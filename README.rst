@@ -49,7 +49,8 @@ Ubuntu Linux
 For **Ubuntu Linux** you roughly have to make sure that the following packages
 are installed:
 
-A. ``texlive`` and ``texlive-pictures`` (and maybe more LaTeX packages)
+A. ``texlive``, ``texlive-pictures``, and ``texlive-latex-extra`` (and maybe
+   more LaTeX packages)
 
 B. Depending on the chosen conversion suite the following package(s) have to be
    installed:
