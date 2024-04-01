@@ -86,7 +86,7 @@ def changedir(directory):
         chdir(curdir)
 
 
-def system(command, builder, outfile=None):
+def system(command, builder, outfile=None, offending=None):
     """Perform a system call, handling errors.
 
     :param list command: System command to run.
@@ -95,7 +95,7 @@ def system(command, builder, outfile=None):
     """
     binary = command[0]
     try:
-        process = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
+        process = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
             raise
@@ -103,9 +103,15 @@ def system(command, builder, outfile=None):
     stdout, stderr = process.communicate()
     if process.returncode != 0:
         builder._tikz_warned = True
-        raise TikzExtError('Error (tikz extension): %s exited with error:'
-                           '\n[stderr]\n%s\n[stdout]\n%s'
-                           % (binary, stderr, stdout))
+        message = 'Error (tikz extension):'
+        if offending:
+            message += f'\n\nOffending input:\n\n{offending}\n'
+        message += f'\n{binary} exited with error code {process.returncode}'
+        if stderr and stdout:
+            message += f'\n\nstderr:\n{stderr}\n\nstdout{stdout}\n'
+        else:
+            message += f'\n\n{stderr}{stdout}'
+        raise TikzExtError(message)
     if outfile is not None:
         f = open(outfile, 'wb')
         f.write(stdout)
@@ -278,7 +284,7 @@ def render_tikz(self, node, libs='', stringsubst=False):
 
         system([config.latex_engine, '--interaction=nonstopmode',
                 'tikz-%s.tex' % shasum],
-               self.builder)
+               self.builder, None, latex.decode())
 
         resolution = str(config.tikz_resolution)
 
@@ -332,10 +338,7 @@ def html_visit_tikzinline(self, node):
     try:
         fname = render_tikz(self, node, libs)
     except TikzExtError as exc:
-        info = str(exc)[str(exc).find('!'):].replace('\\n', '\n')
-        sm = nodes.system_message(info, type='WARNING', level=2,
-                                  backrefs=[], source=node['tikz'])
-        sm.walkabout(self)
+        self.document.reporter.error(str(exc))
     else:
         self.body.append('<img src="%s"/>' % fname)
     raise nodes.SkipNode
@@ -347,10 +350,7 @@ def html_visit_tikz(self, node):
     try:
         fname = render_tikz(self, node, libs, node['stringsubst'])
     except TikzExtError as exc:
-        info = str(exc)[str(exc).find('!'):].replace('\\n', '\n')
-        sm = nodes.system_message(info, type='WARNING', level=2,
-                                  backrefs=[], source=node['tikz'])
-        sm.walkabout(self)
+        self.document.reporter.error(str(exc))
     else:
         # If scaling option is set, add 'width' attribute
         scale = ''
