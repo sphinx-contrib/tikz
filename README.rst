@@ -165,6 +165,11 @@ Additionally, the following configuration values are supported:
 
     tikz_latex_preamble = ‹string›
 
+  .. note:: LaTeX preamble code is best written as a raw string ``r'‹LaTeX code›'``
+     or a raw multi-line string ``r'''‹multiple lines of LaTeX code›'''``.  This
+     tells Python to disable transformation of backslash escape sequences such as
+     ``\n`` into special characters such as newline.
+
 * To support ``\includegraphics{‹file›}`` within a Ti\ *k*\ Z picture, you have to
   configure the directory path(s) where the ``‹file›``\ s reside by setting::
 
