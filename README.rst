@@ -210,11 +210,13 @@ Additionally, the following configuration values are supported:
 .. note:: If you want to make use of the Ti\ *k*\ Z externalization library for
    the LaTeX build output, then you may want to change the line::
 
-     LATEXOPTS =
+     export LATEXOPTS ?=
 
-   in Sphinx LaTeX Makefile (``/usr/share/sphinx/texinputs/Makefile``) to::
+   in Sphinx LaTeX Makefile template
+   (``‹yourvirtualenv›/lib/python‹x›.‹y›/site-packages/sphinx/texinputs/Makefile_t``)
+   to::
 
-     LATEXOPTS = "-shell-escape"
+     export LATEXOPTS ?= "-shell-escape"
 
 .. highlight:: rest
 
