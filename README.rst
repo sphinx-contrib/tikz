@@ -165,10 +165,21 @@ Additionally, the following configuration values are supported:
 
     tikz_latex_preamble = ‹string›
 
+  .. note:: If ``tikz_latex_preamble`` is not configured, then the LaTeX preamble
+     automatically falls back to ``latex_elements['preamble']``.
+
   .. note:: LaTeX preamble code is best written as a raw string ``r'‹LaTeX code›'``
      or a raw multi-line string ``r'''‹multiple lines of LaTeX code›'''``.  This
      tells Python to disable transformation of backslash escape sequences such as
      ``\n`` into special characters such as newline.
+
+* Copy files to the directory that is used for building the Ti\ *k*\ Z picture,
+  analogous to ``latex_additional_files``::
+
+    `tikz_additional_files = ‹list of strings›
+
+  .. note:: If ``tikz_additional_files`` is not configured, then the list of files to
+     be copied automatically falls back to ``latex_additional_files``.
 
 * To support ``\includegraphics{‹file›}`` within a Ti\ *k*\ Z picture, you have to
   configure the directory path(s) where the ``‹file›``\ s reside by setting::

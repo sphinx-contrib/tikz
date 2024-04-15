@@ -68,6 +68,8 @@ try:
 except ImportError:
     from sphinx.util import ensuredir
 
+from sphinx.util.fileutil import copy_asset_file
+
 from glob import glob
 
 _Win_ = sys.platform[0:3] == 'win'
@@ -272,7 +274,10 @@ def render_tikz(self, node, libs='', stringsubst=False):
 
     latex = DOC_HEAD % libs
     latex += self.builder._tikz_preamble
-    latex += config.tikz_latex_preamble
+    if config.tikz_latex_preamble:
+        latex += config.tikz_latex_preamble
+    else:
+        latex += config.latex_elements['preamble']
     latex += DOC_BODY % tikz
     latex = latex.encode('utf-8')
 
@@ -439,7 +444,8 @@ def cleanup_tempdir(app, exc):
 def builder_inited(app):
     app.builder._tikz_tempdir = tempfile.mkdtemp()
     app.builder._tikz_preamble = ''
-    extgfxpath = app.builder.config.tikz_includegraphics_path
+    config = app.builder.config
+    extgfxpath = config.tikz_includegraphics_path
     if not extgfxpath == '':
         if isinstance(extgfxpath, str):
             extgfxpath = [extgfxpath]
@@ -458,17 +464,31 @@ def builder_inited(app):
         sty.write(r"\RequirePackage{amsmath}" + "\n")
         sty.write(r"\RequirePackage{amsfonts}" + "\n")
         sty.write(r"\RequirePackage{pgfplots}" + "\n")
-        tikzlibs = app.builder.config.tikz_tikzlibraries
+        tikzlibs = config.tikz_tikzlibraries
         tikzlibs = tikzlibs.replace(' ', '')
         tikzlibs = tikzlibs.replace('\t', '')
         tikzlibs = tikzlibs.strip(', ')
         sty.write("\\usetikzlibrary{%s}\n" % tikzlibs)
         sty.write(app.builder._tikz_preamble)
-        sty.write(app.builder.config.tikz_latex_preamble + "\n")
+        latex_preamble = config.tikz_latex_preamble \
+            if config.tikz_latex_preamble \
+            else config.latex_elements['preamble']
+        sty.write(latex_preamble + "\n")
         sty.close()
 
-        app.builder.config.latex_additional_files.append(sty_path)
+        config.latex_additional_files.append(sty_path)
+        config.latex_additional_files.extend(
+            config.tikz_additional_files)
         app.add_latex_package("sphinxcontribtikz")
+
+    if app.builder.name == "html":
+        additional_files = config.tikz_additional_files \
+            if config.tikz_additional_files \
+            else config.latex_additional_files
+        if additional_files:
+            for filename in additional_files:
+                copy_asset_file(path.join(app.builder.confdir, filename),
+                                app.builder._tikz_tempdir)
 
 
 def which(program):
@@ -502,6 +522,7 @@ def setup(app):
     app.add_role('tikz', tikz_role)
     app.add_directive('tikz', TikzDirective)
     app.add_config_value('tikz_latex_preamble', '', 'env')
+    app.add_config_value('tikz_additional_files', [], 'env')
     app.add_config_value('tikz_tikzlibraries', '', 'env')
     app.add_config_value('tikz_transparent', True, 'html')
     app.add_config_value('tikz_includegraphics_path', '', 'env')
