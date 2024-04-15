@@ -50,7 +50,6 @@ import os
 import re
 
 from errno import ENOENT
-from os import path, getcwd, chdir
 from string import Template
 from subprocess import Popen, PIPE
 try:
@@ -80,12 +79,12 @@ _Win_ = sys.platform[0:3] == 'win'
 @contextlib.contextmanager
 def changedir(directory):
     """Context to temporary change directory"""
-    curdir = getcwd()
-    chdir(directory)
+    curdir = os.getcwd()
+    os.chdir(directory)
     try:
         yield
     finally:
-        chdir(curdir)
+        os.chdir(curdir)
 
 
 def system(command, builder, outfile=None, offending=None):
@@ -115,9 +114,8 @@ def system(command, builder, outfile=None, offending=None):
             message += f'\n\n{stderr}{stdout}'
         raise TikzExtError(message)
     if outfile is not None:
-        f = open(outfile, 'wb')
-        f.write(stdout)
-        f.close()
+        with open(outfile, 'wb') as f:
+            f.write(stdout)
 
 
 class TikzExtError(SphinxError):
@@ -194,11 +192,8 @@ class TikzDirective(Directive):
             rel_filename, filename = env.relfn2path(node['include'])
             env.note_dependency(rel_filename)
             try:
-                fp = codecs.open(filename, 'r', 'utf-8')
-                try:
-                    node['tikz'] = '\n' + fp.read() + '\n'
-                finally:
-                    fp.close()
+                with codecs.open(filename, 'r', 'utf-8') as f:
+                    node['tikz'] = '\n' + f.read() + '\n'
             except (IOError, OSError):
                 return [self.state.document.reporter.warning(
                     'External Tikz file %r not found or reading '
@@ -251,7 +246,7 @@ def cleanup_tikzcode(self, node):
             tikz = '\\begin{tikzpicture}\n' + tikz + '\n\\end{tikzpicture}'
 
     if 'stringsubst' in node:
-        tikz = Template(tikz).safe_substitute(wd=getcwd().replace('\\', '/'))
+        tikz = Template(tikz).safe_substitute(wd=os.getcwd().replace('\\', '/'))
     return tikz
 
 
@@ -262,15 +257,15 @@ def render_tikz(self, node, libs='', stringsubst=False):
     shasum = sha(tikz.encode('utf-8')).hexdigest()
     fname = 'tikz-%s.%s' % (shasum, OUT_EXTENSION[config.tikz_proc_suite])
     relfn = posixpath.join(self.builder.imgpath, fname)
-    outfn = path.join(self.builder.outdir, '_images', fname)
+    outfn = os.path.join(self.builder.outdir, '_images', fname)
 
-    if path.isfile(outfn):
+    if os.path.isfile(outfn):
         return relfn
 
     if hasattr(self.builder, '_tikz_warned'):
         return None
 
-    ensuredir(path.dirname(outfn))
+    ensuredir(os.path.dirname(outfn))
 
     latex = DOC_HEAD % libs
     latex += self.builder._tikz_preamble
@@ -283,9 +278,8 @@ def render_tikz(self, node, libs='', stringsubst=False):
 
     with changedir(self.builder._tikz_tempdir):
 
-        tf = open('tikz-%s.tex' % shasum, 'wb')
-        tf.write(latex)
-        tf.close()
+        with open('tikz-%s.tex' % shasum, 'wb') as f:
+            f.write(latex)
 
         system([config.latex_engine, '--interaction=nonstopmode',
                 'tikz-%s.tex' % shasum],
@@ -459,21 +453,21 @@ def builder_inited(app):
     if app.builder.name == "latex":
         sty_path = os.path.join(app.builder._tikz_tempdir,
                                 "sphinxcontribtikz.sty")
-        sty = open(sty_path, mode="w")
-        sty.write(r"\RequirePackage{tikz}" + "\n")
-        sty.write(r"\RequirePackage{amsmath}" + "\n")
-        sty.write(r"\RequirePackage{amsfonts}" + "\n")
-        sty.write(r"\RequirePackage{pgfplots}" + "\n")
-        tikzlibs = config.tikz_tikzlibraries
-        tikzlibs = tikzlibs.replace(' ', '')
-        tikzlibs = tikzlibs.replace('\t', '')
-        tikzlibs = tikzlibs.strip(', ')
-        sty.write("\\usetikzlibrary{%s}\n" % tikzlibs)
-        sty.write(app.builder._tikz_preamble)
-        latex_preamble = config.tikz_latex_preamble \
-            if config.tikz_latex_preamble \
-            else config.latex_elements['preamble']
-        sty.write(latex_preamble + "\n")
+        with open(sty_path, mode="w") as sty:
+            sty.write(r"\RequirePackage{tikz}" + "\n")
+            sty.write(r"\RequirePackage{amsmath}" + "\n")
+            sty.write(r"\RequirePackage{amsfonts}" + "\n")
+            sty.write(r"\RequirePackage{pgfplots}" + "\n")
+            tikzlibs = config.tikz_tikzlibraries
+            tikzlibs = tikzlibs.replace(' ', '')
+            tikzlibs = tikzlibs.replace('\t', '')
+            tikzlibs = tikzlibs.strip(', ')
+            sty.write("\\usetikzlibrary{%s}\n" % tikzlibs)
+            sty.write(app.builder._tikz_preamble)
+            latex_preamble = config.tikz_latex_preamble \
+                if config.tikz_latex_preamble \
+                else config.latex_elements['preamble']
+            sty.write(latex_preamble + "\n")
         sty.close()
 
         config.latex_additional_files.append(sty_path)
@@ -487,7 +481,7 @@ def builder_inited(app):
             else config.latex_additional_files
         if additional_files:
             for filename in additional_files:
-                copy_asset_file(path.join(app.builder.confdir, filename),
+                copy_asset_file(os.path.join(app.builder.confdir, filename),
                                 app.builder._tikz_tempdir)
 
 
