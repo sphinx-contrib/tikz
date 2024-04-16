@@ -271,7 +271,7 @@ def render_tikz(self, node, libs='', stringsubst=False):
     latex += self.builder._tikz_preamble
     if config.tikz_latex_preamble:
         latex += config.tikz_latex_preamble
-    else:
+    elif 'preamble' in config.latex_elements:
         latex += config.latex_elements['preamble']
     latex += DOC_BODY % tikz
     latex = latex.encode('utf-8')
@@ -464,10 +464,10 @@ def builder_inited(app):
             tikzlibs = tikzlibs.strip(', ')
             sty.write("\\usetikzlibrary{%s}\n" % tikzlibs)
             sty.write(app.builder._tikz_preamble)
-            latex_preamble = config.tikz_latex_preamble \
-                if config.tikz_latex_preamble \
-                else config.latex_elements['preamble']
-            sty.write(latex_preamble + "\n")
+            if config.tikz_latex_preamble:
+                sty.write(config.tikz_latex_preamble + "\n")
+            elif 'preamble' in config.latex_elements:
+                sty.write(config.latex_elements['preamble'] + "\n")
         sty.close()
 
         config.latex_additional_files.append(sty_path)
