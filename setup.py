@@ -1,5 +1,19 @@
 # -*- coding: utf-8 -*-
 
+import pathlib
+
+def get_version(path : str = 'sphinxcontrib/__init__.py') -> str:
+    """
+    Get the version string, written as "__version__ = <version-comes-here>".
+
+    Inspired by https://packaging.python.org/en/latest/guides/single-sourcing-package-version/.
+    """
+    with open(pathlib.Path(__file__).parent / path) as f:
+        for line in f:
+            if line.startswith('__version__'):
+                return line.split('__version__')[-1].strip().lstrip('=').strip()
+    raise RuntimeError("Unable to find version string.")
+
 LONG_DESCRIPTION = \
 '''
 This package contains the tikz Sphinx extension, which enables the use
@@ -8,7 +22,6 @@ of the PGF/TikZ LaTeX package to draw nice pictures.
 
 NAME         = 'sphinxcontrib-tikz'
 DESCRIPTION  = 'TikZ extension for Sphinx'
-VERSION      = '0.4.19'
 AUTHOR       = 'Christoph Reller'
 AUTHOR_EMAIL = 'christoph.reller@gmail.com'
 URL          = 'https://bitbucket.org/philexander/tikz'
@@ -35,11 +48,10 @@ CLASSIFIERS  = [
 if __name__ == "__main__":
 
     from setuptools import setup, find_packages
-    import sys
 
     setup(
         name=NAME,
-        version=VERSION,
+        version = get_version(),
         url=URL,
         download_url=DOWNLOAD,
         license=LICENSE,
@@ -54,4 +66,4 @@ if __name__ == "__main__":
         include_package_data=True,
         install_requires=REQUIRES,
         namespace_packages=['sphinxcontrib'],
-        )
+    )

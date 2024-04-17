@@ -1,4 +1,4 @@
 *.pyc
-_build/
+build/
 dist/
 sphinxcontrib_tikz.egg-info/
