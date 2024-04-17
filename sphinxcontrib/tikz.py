@@ -38,8 +38,6 @@
     Author: Christoph Reller <christoph.reller@gmail.com>
 """
 
-__version__ = '0.4.19'
-
 import contextlib
 import tempfile
 import posixpath

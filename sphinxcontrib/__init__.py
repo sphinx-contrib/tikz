@@ -10,5 +10,7 @@
     :license: BSD, see LICENSE for details.
 """
 
+__version__ = '0.4.19'
+
 __import__('pkg_resources').declare_namespace(__name__)
 

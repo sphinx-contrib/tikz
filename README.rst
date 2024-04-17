@@ -143,7 +143,7 @@ Additionally, the following configuration values are supported:
 * Choose the image processing ``‹suite›``, either ``'pdf2svg'``, ``'Netpbm'``,
   ``'ImageMagick'``, ``'GhostScript'`` (``'pdf2svg'`` by default)::
 
-    tikz_proc_suite = ‹suite›
+    tikz_proc_suite = <suite>
 
   .. note::
 
@@ -154,16 +154,16 @@ Additionally, the following configuration values are supported:
 * Choose an image resolution (ignored if ``tikz_proc_suite`` is ``'pdf2svg'``,
   default ``184``)::
 
-    tikz_resolution = ‹number›
+    tikz_resolution = <number>
 
 * Enable/disable transparent graphics (enabled by default)::
 
-    tikz_transparent = ‹True or False›
+    tikz_transparent = <True or False>
 
 * Add ``‹string›`` to the LaTeX preamble used for building the Ti\ *k*\ Z
   picture::
 
-    tikz_latex_preamble = ‹string›
+    tikz_latex_preamble = <string>
 
   .. note:: If ``tikz_latex_preamble`` is not configured, then the LaTeX preamble
      automatically falls back to ``latex_elements['preamble']``.
@@ -176,7 +176,7 @@ Additionally, the following configuration values are supported:
 * Copy files to the directory that is used for building the Ti\ *k*\ Z picture,
   analogous to ``latex_additional_files``::
 
-    `tikz_additional_files = ‹list of strings›
+    tikz_additional_files = <list of strings>
 
   .. note:: If ``tikz_additional_files`` is not configured, then the list of files to
      be copied automatically falls back to ``latex_additional_files``.
@@ -201,11 +201,13 @@ Additionally, the following configuration values are supported:
 * Add ``\usetikzlibrary{‹string›}`` to the LaTeX preamble used for building the
   Ti\ *k*\ Z picture::
 
-    tikz_tikzlibraries = ‹string›
+    tikz_tikzlibraries = <string>
 
   .. note:: If you want to use the ``latex`` target, then you have to take care to
      include in ``tikz_libraries`` any ``‹tikz libraries›`` given to the ``libs``
      option of the ``tikz`` directive (see :ref:`usage`)
+
+.. highlight:: bash
 
 .. note:: If you want to make use of the Ti\ *k*\ Z externalization library for
    the LaTeX build output, then you may want to change the line::
