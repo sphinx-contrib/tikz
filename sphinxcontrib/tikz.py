@@ -96,12 +96,13 @@ def system(command, builder, outfile=None, offending=None):
     """
     binary = command[0]
     try:
-        process = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE, text=True)
+        t = False if command[0] == 'pnmtopng' else True
+        process = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE, text=t)
+        stdout, stderr = process.communicate()
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
             raise
         raise TikzExtError('!%s command cannot be run' % binary)
-    stdout, stderr = process.communicate()
     if process.returncode != 0:
         builder._tikz_warned = True
         message = 'Error (tikz extension):'
