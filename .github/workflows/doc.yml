@@ -1,0 +1,28 @@
+name: documentation
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+
+  workflow_dispatch:
+
+jobs:
+
+  build-documentation:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.10
+    steps:
+      - name: Installation.
+        run : |
+          apt update
+          apt install --yes --no-install-recommends git texlive-latex-extra ghostscript
+          python3 -m pip install sphinx-rtd-theme
+          python3 -m pip install git+${{ github.server_url }}/${{ github.repository }}@${{ github.sha }}
+      - uses: actions/checkout@v4
+      - name: Generate documentation.
+        run : |
+          cd doc
+          make html

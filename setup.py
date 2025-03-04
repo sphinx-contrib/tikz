@@ -35,7 +35,6 @@ CLASSIFIERS  = [
 if __name__ == "__main__":
 
     from setuptools import setup, find_packages
-    import sys
 
     setup(
         name=NAME,
@@ -54,4 +53,4 @@ if __name__ == "__main__":
         include_package_data=True,
         install_requires=REQUIRES,
         namespace_packages=['sphinxcontrib'],
-        )
+    )

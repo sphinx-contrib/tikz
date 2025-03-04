@@ -3,11 +3,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+Welcome to `TikZ`'s documentation!
+==================================
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 5
 
-.. include:: ../README.rst
+   readme
 
+.. toctree::
+   :maxdepth: 1
+
+   apidocs/tikz.rst
 
 ..
    Indices and tables
